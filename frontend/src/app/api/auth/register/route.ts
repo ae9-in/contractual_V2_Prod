@@ -20,14 +20,14 @@ const onboardingSchema = z.object({
   bio: z.string().max(2000).optional(),
   hourlyRate: z.number().min(0).optional(),
   gender: z.string().optional(),
-  image: z.string().url().optional(),
+  image: z.string().url().optional().or(z.literal("")),
   linkedinUrl: z.string().url().optional().or(z.literal("")),
   githubUrl: z.string().url().optional().or(z.literal("")),
   websiteUrl: z.string().url().optional().or(z.literal("")),
   skills: z.array(z.object({ name: z.string(), level: z.string().optional() })).max(50).optional(),
   languages: z.array(z.object({ name: z.string(), proficiency: z.string().optional() })).max(20).optional(),
-  portfolio: z.array(z.object({ title: z.string(), imageUrl: z.string().url() })).max(12).optional(),
-}).strict()
+  portfolio: z.array(z.object({ title: z.string(), imageUrl: z.string().url().or(z.literal("")) })).max(12).optional(),
+}) // removed .strict() to allow extra frontend fields
 
 const schema = z.object({
   email: z.string().email().toLowerCase(),
