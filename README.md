@@ -1,55 +1,56 @@
-# Contractual
+# Contractual.pro
 
-Two-sided freelance marketplace (Next.js App Router). **Public:** `/`, `/browse`, `/gig/[id]`, `/freelancer/[id]`. **Dashboards (auth required):** `/freelancer/*`, `/business/*`, `/admin/*`. Legacy `/gigs` and `/dashboard/*` URLs redirect to the new paths.
+A premium marketplace connecting high-tier freelancers with innovative businesses.
 
-## Prerequisites
+## Project Overview
+Contractual.pro is a professional platform designed to facilitate secure contracts, verified payments, and elite gig opportunities. This repository contains the complete monorepo for the project.
 
-- Node.js 20+
-- pnpm (recommended)
+## Folder Structure
+- `frontend/` - Everything user sees. Next.js app, UI components, frontend API routes.
+- `backend/` - Database and schema. Prisma configuration, migrations, and seed scripts.
 
-## Setup
+## Tech Stack
+- Frontend: Next.js 16 (App Router), React 19, Tailwind CSS v4, shadcn/ui
+- Backend: PostgreSQL, Prisma ORM
+- Auth: NextAuth.js
+- Real-time: Socket.io / Pusher
+- File Uploads: UploadThing
 
-```bash
-pnpm install
-cp .env.example .env.local
-# Ensure .env has DATABASE_URL and AUTH_SECRET (see .env.example)
-pnpm db:migrate   # or: npx prisma migrate dev
-npx tsx prisma/seed.ts
-pnpm dev
-```
+## Getting Started
 
-Open [http://localhost:3000](http://localhost:3000).
+1. Install dependencies:
+   ```bash
+   # From root
+   pnpm install
+   ```
 
-## Demo auth (after seed)
+2. Environment Variables:
+   Copy `.env.example` to `.env` in the root and configure values.
+   Copy the respective variables to `frontend/.env.local` and `backend/.env`.
 
-| Role        | Email                          | Password     |
-|------------|---------------------------------|--------------|
-| Freelancer | `freelancer@demo.contractual`   | `password123` |
-| Business   | `business@demo.contractual`     | `password123` |
-| Admin      | `admin@demo.contractual`        | `password123` |
+3. Database Setup:
+   ```bash
+   # From root
+   npm run db:push
+   npm run db:generate
+   ```
 
-Protected routes use middleware: you must sign in to access `/freelancer`, `/business`, or `/admin` dashboards. Google OAuth is optional (`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`).
+4. Start Development Server:
+   ```bash
+   # From root
+   npm run dev
+   ```
 
-## API (mock / integration)
+## Deployment Guide
 
-- `POST /api/auth/register` — email/password signup (Zod-validated).
-- `GET /api/me` — current session + home route by role.
-- `POST /api/stripe/mock-checkout` — mock payment intent JSON (no real Stripe call).
-- `GET /api/messages/poll` — mock realtime events (replace with Pusher/Socket.io).
+### Vercel (Frontend)
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Install Command: `npm install`
+- Environment Variables: Setup from `.env.local`
 
-## Data
+### Render (Backend / Database)
+- Contractual.pro utilizes Render solely for hosting the PostgreSQL database instance. No server code is deployed to Render. Ensure the `DATABASE_URL` is configured correctly on the Vercel app.
 
-- **UI demos:** `lib/mock-data.ts` (gigs, freelancers, charts).
-- **Database:** Prisma + SQLite by default (`prisma/dev.db`). Switch `DATABASE_URL` to PostgreSQL for production.
-
-```bash
-pnpm db:studio
-```
-
-## Stack
-
-Next.js 16, React 19, **NextAuth.js v5** (credentials + optional Google), Prisma 5, TanStack Query, Zustand (UI store), Tailwind v4, Framer Motion, shadcn/ui, Recharts, Sonner.
-
-## Fonts
-
-Playfair Display, DM Sans, JetBrains Mono — `app/layout.tsx`.
+## Admin Access
+Admin routes are protected. To access `/workspace-admin`, use the configured `ADMIN_EMAIL` and `ADMIN_PASSWORD_HASH` values from the `.env` file.

@@ -1,6 +1,0 @@
------------------------------------------
-Admin User (Upserted)
-Email: admin@contractual.com
-Password: Admin@55vuxww8
-Keep these credentials safe.
------------------------------------------
