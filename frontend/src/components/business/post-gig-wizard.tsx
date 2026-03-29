@@ -374,7 +374,31 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
                   <UploadButton
                     endpoint="gigBanner"
                     onClientUploadComplete={(res) => {
-                      if (res?.[0]) setBannerImage(res[0].url)
+                      const url = res?.[0]?.url
+                      if (!url) return
+                      setBannerImage(url)
+
+                      // Persist immediately for existing gigs so Browse/Landing reflects it
+                      // even if the user forgets to click "Save" in the wizard.
+                      if (editId) {
+                        void fetch(`/api/gigs/${editId}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ bannerImage: url }),
+                        })
+                          .then(async (r) => {
+                            if (!r.ok) {
+                              const t = await r.text().catch(() => "")
+                              throw new Error(t || `Failed to save banner (${r.status})`)
+                            }
+                            void qc.invalidateQueries({ queryKey: qk.businessMyGigs() })
+                            void qc.invalidateQueries({ queryKey: qk.gigs() })
+                          })
+                          .catch((e) => {
+                            console.error("Failed to persist gig banner", e)
+                            toast.error("Banner uploaded, but couldn't save it to the gig. Click Save to retry.")
+                          })
+                      }
                     }}
                     onUploadError={(error) => toast.error(error.message)}
                     className="absolute inset-0"
