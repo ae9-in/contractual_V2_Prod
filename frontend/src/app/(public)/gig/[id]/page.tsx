@@ -1,4 +1,5 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { GigDetailView } from "@/components/gig/gig-detail-view"
 import { getCategoryGigImage } from "@/lib/category-gig-image"
@@ -12,6 +13,11 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
   
   if (!id) notFound()
 
+  const session = await auth()
+  if (!session?.user?.id) {
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(`/gig/${id}`)}`)
+  }
+
   const gig = await prisma.gig.findUnique({
     where: { id },
     include: {
@@ -23,6 +29,7 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
           image: true,
           location: true,
           industry: true,
+          isVerified: true,
         }
       },
       requiredSkills: true,
@@ -109,6 +116,20 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
         ]
       }
     ],
+    // GigDetailView is still based on the "freelancer services" mock shape.
+    // Map the business as the "freelancer" card to avoid runtime crashes.
+    freelancerId: gig.business.id,
+    freelancer: {
+      name: gig.business.companyName || gig.business.name,
+      avatar: gig.business.image || "",
+    },
+    freelancerMeta: {
+      verified: gig.business.isVerified ?? false,
+      memberSince: "2026",
+      responseBadge: null,
+    },
+    rating: 0,
+    reviewCount: 0,
     business: {
       name: gig.business.companyName || gig.business.name,
       tagline: gig.business.industry || "Professional Business",
