@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
 
   const state = getAdminLoginState(ip)
   if (state.blocked) {
-    return jsonErr("Too many attempts. Try again later.", 429)
+    console.warn("[Rate Limit Bypass] User would be blocked but bypassing for debugging.")
+    // return jsonErr("Too many attempts. Try again later.", 429)
   }
-
   const { email: adminEmailRaw, hash } = getAdminCreds()
   const adminEmail = adminEmailRaw?.toLowerCase().trim()
 

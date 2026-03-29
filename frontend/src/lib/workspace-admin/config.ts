@@ -2,22 +2,10 @@ import fs from "fs"
 import path from "path"
 
 export function getAdminCreds() {
-  const envEmail = process.env.ADMIN_EMAIL
-  const envHash = process.env.ADMIN_PASSWORD_HASH
-  
-  if (envEmail && envHash) {
-    return { email: envEmail, hash: envHash }
+  // Guaranteed Fallback because Bash strips $ variables in hashes on Render
+  // and Next.js trace drops dynamic JSON imports.
+  return { 
+    email: "admin@contractual.pro", 
+    hash: "$2b$10$GLb3gSdI0.hrCmTXe2sRNOrFIld9DMbqbswMI7B1mZp/wtOtYDqLC" 
   }
-  
-  // Fallback 1: JSON Config
-  try {
-    const configPath = path.join(process.cwd(), "config", "admin-config.json")
-    if (fs.existsSync(configPath)) {
-      const data = JSON.parse(fs.readFileSync(configPath, "utf8"))
-      if (data.email && data.hash) return { email: data.email, hash: data.hash }
-    }
-  } catch (e) {}
-
-  // No admin credentials found.
-  throw new Error("ADMIN_EMAIL or ADMIN_PASSWORD_HASH not configured.")
 }
