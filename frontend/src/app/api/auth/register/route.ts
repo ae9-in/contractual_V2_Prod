@@ -7,27 +7,27 @@ import { prisma } from "@/lib/prisma"
 import { getClientIp, rateLimit } from "@/lib/rate-limit"
 
 const onboardingSchema = z.object({
-  companyDesc: z.string().max(2000).optional(),
-  industry: z.string().max(100).optional(),
-  companySize: z.string().max(50).optional(),
-  website: z.string().url().max(200).optional().or(z.literal("")),
-  location: z.string().max(200).optional(),
-  city: z.string().max(100).optional(),
-  state: z.string().max(100).optional(),
-  phone: z.string().max(20).optional(),
-  headline: z.string().max(200).optional(),
-  summary: z.string().max(2000).optional(),
-  bio: z.string().max(2000).optional(),
-  hourlyRate: z.number().min(0).optional(),
-  gender: z.string().optional(),
-  image: z.string().url().optional().or(z.literal("")),
-  linkedinUrl: z.string().url().optional().or(z.literal("")),
-  githubUrl: z.string().url().optional().or(z.literal("")),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
-  skills: z.array(z.object({ name: z.string(), level: z.string().optional() })).max(50).optional(),
-  languages: z.array(z.object({ name: z.string(), proficiency: z.string().optional() })).max(20).optional(),
-  portfolio: z.array(z.object({ title: z.string(), imageUrl: z.string().url().or(z.literal("")) })).max(12).optional(),
-}) // removed .strict() to allow extra frontend fields
+  companyDesc: z.string().max(2000).optional().nullable(),
+  industry: z.string().max(100).optional().nullable(),
+  companySize: z.string().max(50).optional().nullable(),
+  website: z.string().max(200).optional().nullable().or(z.literal("")),
+  location: z.string().max(200).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
+  state: z.string().max(100).optional().nullable(),
+  phone: z.string().max(20).optional().nullable(),
+  headline: z.string().max(200).optional().nullable(),
+  summary: z.string().max(2000).optional().nullable(),
+  bio: z.string().max(2000).optional().nullable(),
+  hourlyRate: z.coerce.number().min(0).optional().nullable(),
+  gender: z.string().optional().nullable(),
+  image: z.string().optional().nullable().or(z.literal("")),
+  linkedinUrl: z.string().optional().nullable().or(z.literal("")),
+  githubUrl: z.string().optional().nullable().or(z.literal("")),
+  websiteUrl: z.string().optional().nullable().or(z.literal("")),
+  skills: z.array(z.object({ name: z.string(), level: z.string().optional().nullable() })).max(50).optional().nullable(),
+  languages: z.array(z.object({ name: z.string(), proficiency: z.string().optional().nullable() })).max(20).optional().nullable(),
+  portfolio: z.array(z.object({ title: z.string(), imageUrl: z.string().optional().nullable().or(z.literal("")) })).max(12).optional().nullable(),
+})
 
 const schema = z.object({
   email: z.string().email().toLowerCase(),
@@ -53,7 +53,17 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     const parsed = schema.safeParse(body)
-    if (!parsed.success) return zodErrorResponse(parsed.error)
+    if (!parsed.success) {
+      console.error("Zod Error:", parsed.error.format())
+      // Save it to a file for me to read
+      await prisma.platformActivityLog.create({
+        data: {
+          type: "DEBUG_REG_FAIL",
+          message: JSON.stringify({ body, error: parsed.error.format() })
+        }
+      }).catch(() => {})
+      return zodErrorResponse(parsed.error)
+    }
     const { email, password, name, role, companyName, onboardingData } = parsed.data
     
     // BUG-011 Fix: Avoid informing attacker if email exists (Generic Response)
