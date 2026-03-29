@@ -41,7 +41,7 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com wss: ws:; frame-src https://hcaptcha.com https://*.hcaptcha.com;"
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://hcaptcha.com https://*.hcaptcha.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com https://uploadthing.com https://*.uploadthing.com https://*.ingest.uploadthing.com https://sea1.ingest.uploadthing.com https://api.cloudinary.com wss: ws:; frame-src https://hcaptcha.com https://*.hcaptcha.com;"
           }
         ],
       },
