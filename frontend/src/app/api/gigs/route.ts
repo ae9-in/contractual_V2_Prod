@@ -61,8 +61,12 @@ const listQuerySchema = z.object({
   category: z.string().optional(),
   minBudget: z.coerce.number().optional(),
   maxBudget: z.coerce.number().optional(),
-  deadline: z.enum(["within7", "within14", "within30"]).optional(),
-  experienceLevel: z.enum(["BEGINNER", "INTERMEDIATE", "EXPERT"]).optional(),
+  deadline: z.enum(["within1", "within3", "within7", "within14", "within30"]).optional(),
+  experienceLevel: z.string().optional(), // comma-separated allowed
+  urgent: z
+    .string()
+    .optional()
+    .transform((v) => (v === "true" ? true : v === "false" ? false : undefined)),
   skills: z.string().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
@@ -103,16 +107,41 @@ export async function GET(req: NextRequest) {
       ],
     })
   }
-  if (f.category) where.category = f.category
+  if (f.category) {
+    const cats = f.category
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean)
+    if (cats.length === 1) where.category = cats[0]
+    if (cats.length > 1) where.category = { in: cats }
+  }
   if (f.minBudget != null || f.maxBudget != null) {
     where.budgetAmount = {}
     if (f.minBudget != null) where.budgetAmount.gte = f.minBudget
     if (f.maxBudget != null) where.budgetAmount.lte = f.maxBudget
   }
-  if (f.experienceLevel) where.experienceLevel = f.experienceLevel
+  if (f.experienceLevel) {
+    const allowed = new Set(["BEGINNER", "INTERMEDIATE", "EXPERT"])
+    const levels = f.experienceLevel
+      .split(",")
+      .map((x) => x.trim().toUpperCase())
+      .filter((x) => allowed.has(x))
+    if (levels.length === 1) where.experienceLevel = levels[0] as any
+    if (levels.length > 1) where.experienceLevel = { in: levels as any }
+  }
+  if (f.urgent === true) where.isUrgent = true
 
   if (f.deadline) {
-    const days = f.deadline === "within7" ? 7 : f.deadline === "within14" ? 14 : 30
+    const days =
+      f.deadline === "within1"
+        ? 1
+        : f.deadline === "within3"
+          ? 3
+          : f.deadline === "within7"
+            ? 7
+            : f.deadline === "within14"
+              ? 14
+              : 30
     const until = new Date(now.getTime() + days * 86400000)
     ;(where.AND as any[]).push({ deadline: { lte: until, gte: now } })
   }

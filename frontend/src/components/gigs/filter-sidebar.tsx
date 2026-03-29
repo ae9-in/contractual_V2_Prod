@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -8,7 +8,7 @@ interface FilterSidebarProps {
   onFilterChange?: (filters: Record<string, unknown>) => void
 }
 
-const categories = [
+const fallbackCategories = [
   { name: "Development", count: 1284 },
   { name: "Design", count: 892 },
   { name: "Writing", count: 756 },
@@ -21,21 +21,28 @@ const categories = [
 
 const deliveryTimes = [
   { label: "Any", value: "any" },
-  { label: "Within 24hrs", value: "24h" },
-  { label: "3 Days", value: "3d" },
-  { label: "7 Days", value: "7d" },
-  { label: "14 Days+", value: "14d" },
+  { label: "Within 24hrs", value: "within1" },
+  { label: "3 Days", value: "within3" },
+  { label: "7 Days", value: "within7" },
+  { label: "14 Days+", value: "within14" },
 ]
 
-const skillLevels = [
-  { name: "Beginner", count: 284 },
-  { name: "Intermediate", count: 567 },
-  { name: "Expert", count: 423 },
-]
+const LEVEL_LABEL: Record<string, string> = {
+  BEGINNER: "Beginner",
+  INTERMEDIATE: "Intermediate",
+  EXPERT: "Expert",
+}
+
+const fallbackLevels = Object.keys(LEVEL_LABEL).map((name) => ({ name, count: 0 }))
 
 const gigStatuses = ["Open", "Accepting Applications", "Urgent"]
 
 export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
+  const [facetLoading, setFacetLoading] = useState(true)
+  const [facetError, setFacetError] = useState<string | null>(null)
+  const [facetCategories, setFacetCategories] = useState<{ name: string; count: number }[]>([])
+  const [facetLevels, setFacetLevels] = useState<{ name: string; count: number }[]>([])
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [budgetMin, setBudgetMin] = useState("")
   const [budgetMax, setBudgetMax] = useState("")
@@ -84,9 +91,68 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
     setSelectedDelivery("any")
     setSelectedLevels([])
     setSelectedStatuses(["Open"])
+    onFilterChange?.({})
   }
 
+  useEffect(() => {
+    let active = true
+    const load = async () => {
+      try {
+        const res = await fetch("/api/gigs/facets", { cache: "no-store" })
+        const json = (await res.json()) as {
+          data?: {
+            categories?: { name: string; count: number }[]
+            experienceLevels?: { name: string; count: number }[]
+          }
+          error?: string
+        }
+        if (!res.ok) throw new Error(json.error ?? "Failed to load filters")
+        if (!active) return
+        setFacetCategories(Array.isArray(json.data?.categories) ? json.data!.categories! : [])
+        setFacetLevels(Array.isArray(json.data?.experienceLevels) ? json.data!.experienceLevels! : [])
+        setFacetError(null)
+      } catch (e) {
+        if (!active) return
+        setFacetError(e instanceof Error ? e.message : "Failed to load filters")
+      } finally {
+        if (active) setFacetLoading(false)
+      }
+    }
+
+    void load()
+    const interval = setInterval(() => void load(), 15000)
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
+  }, [])
+
+  const categories = facetError ? fallbackCategories : facetCategories
+  const experienceLevels = facetError ? fallbackLevels : (facetLevels.length ? facetLevels : fallbackLevels)
+
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 5)
+
+  const presets = useMemo(
+    () => [
+      { label: "₹0-₹500", min: 0, max: 500 },
+      { label: "₹500-₹2K", min: 500, max: 2000 },
+      { label: "₹2K+", min: 2000, max: undefined as number | undefined },
+    ],
+    []
+  )
+
+  const applyFilters = () => {
+    const urgent = selectedStatuses.includes("Urgent")
+    const filters: Record<string, unknown> = {
+      category: selectedCategories.length ? selectedCategories.join(",") : undefined,
+      minBudget: budgetMin ? Number(budgetMin) : undefined,
+      maxBudget: budgetMax ? Number(budgetMax) : undefined,
+      deadline: selectedDelivery !== "any" ? selectedDelivery : undefined,
+      experienceLevel: selectedLevels.length ? selectedLevels.join(",") : undefined,
+      urgent: urgent ? "true" : undefined,
+    }
+    onFilterChange?.(filters)
+  }
 
   return (
     <aside className="w-full lg:w-[260px] shrink-0">
@@ -125,9 +191,11 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
                 <span className="text-sm text-[var(--text-primary)] group-hover:text-[var(--primary)]">
                   {cat.name}
                 </span>
-                <span className="text-xs text-[var(--text-secondary)] ml-auto">
-                  ({cat.count})
-                </span>
+                {!facetLoading && !facetError && (
+                  <span className="text-xs text-[var(--text-secondary)] ml-auto">
+                    ({cat.count})
+                  </span>
+                )}
               </label>
             ))}
             {categories.length > 5 && (
@@ -169,6 +237,20 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
               {["₹0-₹500", "₹500-₹2K", "₹2K+"].map((preset) => (
                 <button
                   key={preset}
+                  type="button"
+                  onClick={() => {
+                    const s = String(preset)
+                    if (s.includes("+")) {
+                      setBudgetMin("2000")
+                      setBudgetMax("")
+                      return
+                    }
+                    const [a, b] = s.split("-")
+                    const min = (a ?? "").replace(/[^\d]/g, "")
+                    const max = (b ?? "").replace(/[^\d]/g, "")
+                    if (min) setBudgetMin(min)
+                    if (max) setBudgetMax(max)
+                  }}
                   className={cn(
                     "px-3 py-1.5 text-xs font-medium rounded-full transition-all",
                     budgetMin === preset.split("-")[0]?.replace("$", "")
@@ -218,7 +300,7 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
           onToggle={() => toggleSection("level")}
         >
           <div className="space-y-3">
-            {skillLevels.map((level) => (
+            {experienceLevels.map((level) => (
               <label
                 key={level.name}
                 className="flex items-center gap-3 cursor-pointer group"
@@ -230,11 +312,13 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
                   className="w-4 h-4 rounded border-[var(--border)] text-[var(--primary)] focus:ring-[var(--primary)] accent-[var(--primary)]"
                 />
                 <span className="text-sm text-[var(--text-primary)] group-hover:text-[var(--primary)]">
-                  {level.name}
+                  {LEVEL_LABEL[level.name] ?? level.name}
                 </span>
-                <span className="text-xs text-[var(--text-secondary)] ml-auto">
-                  ({level.count})
-                </span>
+                {!facetLoading && !facetError && (
+                  <span className="text-xs text-[var(--text-secondary)] ml-auto">
+                    ({level.count})
+                  </span>
+                )}
               </label>
             ))}
           </div>
@@ -265,7 +349,11 @@ export function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
         </FilterSection>
 
         {/* Apply button */}
-        <button className="w-full py-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] hover:scale-[1.02] hover:shadow-lg hover:shadow-[var(--shadow-teal)] transition-all duration-300">
+        <button
+          type="button"
+          onClick={applyFilters}
+          className="w-full py-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] hover:scale-[1.02] hover:shadow-lg hover:shadow-[var(--shadow-teal)] transition-all duration-300"
+        >
           Apply Filters
         </button>
       </div>

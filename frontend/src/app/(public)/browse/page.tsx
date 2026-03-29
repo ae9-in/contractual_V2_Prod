@@ -30,6 +30,7 @@ export default function BrowsePage() {
   const [sortBy, setSortBy] = useState("latest")
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [filters, setFilters] = useState<Record<string, unknown>>({})
   const [gigs, setGigs] = useState<ApiGig[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +40,16 @@ export default function BrowsePage() {
 
     const load = async () => {
       try {
-        const res = await fetch(`/api/gigs?limit=60&sort=${encodeURIComponent(sortBy)}`, { cache: "no-store" })
+        const sp = new URLSearchParams()
+        sp.set("limit", "60")
+        sp.set("sort", sortBy)
+        for (const [k, v] of Object.entries(filters)) {
+          if (v == null) continue
+          const s = String(v)
+          if (!s) continue
+          sp.set(k, s)
+        }
+        const res = await fetch(`/api/gigs?${sp.toString()}`, { cache: "no-store" })
         const json = (await res.json()) as { data?: ApiGig[]; error?: string }
         if (!res.ok) throw new Error(json.error ?? "Failed to load gigs")
         if (!active) return
@@ -63,10 +73,17 @@ export default function BrowsePage() {
       active = false
       clearInterval(interval)
     }
-  }, [sortBy])
+  }, [sortBy, filters])
 
   const removeFilter = (filter: string) => {
     setActiveFilters(activeFilters.filter((f) => f !== filter))
+    const key = filter.split(":")[0]?.trim()
+    if (!key) return
+    setFilters((prev) => {
+      const next = { ...prev }
+      delete (next as any)[key]
+      return next
+    })
   }
 
   return (
@@ -85,7 +102,16 @@ export default function BrowsePage() {
 
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="hidden lg:block">
-              <FilterSidebar />
+              <FilterSidebar
+                onFilterChange={(f) => {
+                  setFilters(f)
+                  setActiveFilters(
+                    Object.entries(f)
+                      .filter(([, v]) => v != null && String(v))
+                      .map(([k, v]) => `${k}: ${String(v)}`)
+                  )
+                }}
+              />
             </div>
 
             <button
@@ -119,8 +145,18 @@ export default function BrowsePage() {
                       <X className="w-6 h-6" />
                     </button>
                   </div>
-                  <div className="p-4">
-                    <FilterSidebar />
+                <div className="p-4">
+                    <FilterSidebar
+                      onFilterChange={(f) => {
+                        setFilters(f)
+                        setActiveFilters(
+                          Object.entries(f)
+                            .filter(([, v]) => v != null && String(v))
+                            .map(([k, v]) => `${k}: ${String(v)}`)
+                        )
+                        setShowMobileFilters(false)
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -200,7 +236,10 @@ export default function BrowsePage() {
                     ))}
                     <button
                       type="button"
-                      onClick={() => setActiveFilters([])}
+                      onClick={() => {
+                        setActiveFilters([])
+                        setFilters({})
+                      }}
                       className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
                     >
                       Clear all
