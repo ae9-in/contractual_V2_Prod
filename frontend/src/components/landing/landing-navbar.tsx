@@ -25,8 +25,9 @@ export function LandingNavbar() {
 
   return (
     <header
+      data-mobile-nav="public"
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08]",
+        "landing-navbar fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08]",
         "bg-[var(--dark-surface)]/90 backdrop-blur-xl supports-[backdrop-filter]:bg-[var(--dark-surface)]/80"
       )}
     >
@@ -81,7 +82,7 @@ export function LandingNavbar() {
 
           <button
             type="button"
-            className="rounded-lg p-2 text-white lg:hidden"
+            className="mobile-nav-toggle rounded-lg p-2 text-white lg:hidden"
             onClick={() => setOpen(!open)}
             aria-label={open ? "Close menu" : "Open menu"}
           >
@@ -93,7 +94,7 @@ export function LandingNavbar() {
       {/* Mobile drawer */}
       <div
         className={cn(
-          "border-t border-white/10 bg-[var(--dark-surface)] lg:hidden transition-all duration-300 overflow-hidden",
+          "mobile-nav-drawer border-t border-white/10 bg-[var(--dark-surface)] lg:hidden transition-all duration-300 overflow-hidden",
           open ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
         )}
       >

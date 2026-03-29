@@ -177,7 +177,7 @@ export function FreelancerMessages() {
 
   return (
     <div
-      className="flex overflow-hidden rounded-2xl border bg-white shadow-sm"
+      className="freelancer-messages-page flex overflow-hidden rounded-2xl border bg-white shadow-sm"
       style={{ borderColor: "#e8ecf0", height: "calc(100vh - 76px)" }}
     >
       {/* LEFT PANEL — Conversation List */}

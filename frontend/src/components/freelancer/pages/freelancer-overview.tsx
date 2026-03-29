@@ -212,7 +212,7 @@ export function FreelancerOverview() {
       >
         {/* Subtle Background Accent */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-teal-50/30 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
-        
+
         <div className="relative flex flex-col md:flex-row justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-1">
@@ -221,14 +221,14 @@ export function FreelancerOverview() {
               </span>
               <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-50 text-[10px] font-black text-green-600 uppercase tracking-wider">
                 <div className={cn("w-1.5 h-1.5 rounded-full bg-green-500", statsQ.isFetching ? "animate-ping" : "animate-pulse")} />
-                Live Engine
+                Freelance's Choice
               </div>
             </div>
-            
+
             <h1 className="font-bricolage text-3xl font-extrabold tracking-tight text-[#0f172a]">
               Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0f172a] to-teal-600">{firstName}</span>
             </h1>
-            
+
             <div className="flex items-center gap-3 text-[13px] font-medium text-[#64748b]">
               <div className="flex items-center gap-1.5">
                 <Calendar size={14} className="text-teal-500/70" />

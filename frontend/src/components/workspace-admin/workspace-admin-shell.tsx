@@ -91,8 +91,8 @@ export function WorkspaceAdminShell({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0f1f35] text-white">
-      <aside className="flex w-[220px] shrink-0 flex-col border-r border-white/[0.06] bg-[#0f172a]">
+    <div className="workspace-admin-shell flex min-h-screen bg-[#0f1f35] text-white">
+      <aside data-mobile-nav="workspace-admin" className="flex w-[220px] shrink-0 flex-col border-r border-white/[0.06] bg-[#0f172a]">
         <div className="border-b border-white/[0.06] px-4 py-4">
           <div className="mb-2 inline-block rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
             Admin
@@ -141,8 +141,8 @@ export function WorkspaceAdminShell({ children }: { children: React.ReactNode })
           </button>
         </div>
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/[0.06] bg-[#1e293b] px-6">
+      <div className="workspace-admin-content flex min-w-0 flex-1 flex-col">
+        <header className="workspace-admin-topbar flex h-14 shrink-0 items-center justify-between border-b border-white/[0.06] bg-[#1e293b] px-6">
           <span className="text-sm font-semibold text-slate-300">Contractual Workspace</span>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-[12px] text-slate-400">
@@ -157,7 +157,7 @@ export function WorkspaceAdminShell({ children }: { children: React.ReactNode })
             </div>
           </div>
         </header>
-        <main className="min-h-0 flex-1 overflow-auto p-6">{children}</main>
+        <main className="workspace-admin-main min-h-0 flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
   )

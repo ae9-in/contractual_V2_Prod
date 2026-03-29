@@ -1,6 +1,5 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
 import Link from "next/link"
 import { FileText, Users, CheckCircle } from "lucide-react"
 
@@ -26,29 +25,8 @@ const steps = [
 ]
 
 export function HowItWorksSection() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.2 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
   return (
-    <section ref={sectionRef} className="py-16 lg:py-24 bg-white overflow-hidden">
+    <section className="py-16 lg:py-24 bg-white overflow-hidden">
       <div className="container-page">
         {/* Header */}
         <div className="text-center mb-16">
@@ -70,7 +48,7 @@ export function HowItWorksSection() {
                 stroke="var(--primary)"
                 strokeWidth="2"
                 strokeDasharray="8 8"
-                className={`transition-all duration-1000 ${isVisible ? "opacity-100" : "opacity-0"}`}
+                className="transition-all duration-1000 opacity-100"
               />
             </svg>
           </div>
@@ -79,11 +57,7 @@ export function HowItWorksSection() {
             {steps.map((step, index) => (
               <div
                 key={step.number}
-                className={`flex flex-col items-center text-center transition-all duration-700 ${
-                  isVisible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
+                className="flex flex-col items-center text-center transition-all duration-700 opacity-100 translate-y-0"
                 style={{ transitionDelay: `${index * 200}ms` }}
               >
                 {/* Number circle with icon */}

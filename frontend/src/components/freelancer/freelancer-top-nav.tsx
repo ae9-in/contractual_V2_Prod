@@ -101,6 +101,7 @@ export function FreelancerTopNav({ user }: { user: FreelancerUser }) {
 
   return (
     <header
+      data-mobile-nav="freelancer"
       className="fixed left-0 right-0 top-0 z-50 flex h-[60px] items-center justify-between border-b bg-white px-4 shadow-[0_1px_12px_rgba(0,0,0,0.06)] md:px-8"
       style={{ borderColor: "#e8ecf0" }}
     >
@@ -159,7 +160,7 @@ export function FreelancerTopNav({ user }: { user: FreelancerUser }) {
       </nav>
 
       <nav
-        className="flex max-w-[min(50vw,280px)] flex-1 justify-center gap-0.5 overflow-x-auto md:hidden"
+        className="freelancer-mobile-bottom-nav flex max-w-[min(50vw,280px)] flex-1 justify-center gap-0.5 overflow-x-auto md:hidden"
         aria-label="Freelancer mobile"
       >
         {NAV.map((item) => {

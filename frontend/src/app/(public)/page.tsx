@@ -3,10 +3,8 @@ import { Footer } from "@/components/footer"
 import { HeroSection } from "@/components/landing/hero-section"
 import { StatsCounter } from "@/components/stats-counter"
 import { CategoriesSection } from "@/components/landing/categories-section"
-import { TopGigsSection } from "@/components/landing/top-gigs-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { TrustedBySection } from "@/components/landing/trusted-by-section"
-import { TestimonialsSection } from "@/components/landing/testimonials-section"
 import { DualCtaSection } from "@/components/landing/dual-cta-section"
 
 const stats = [
@@ -23,10 +21,8 @@ export default function HomePage() {
       <HeroSection />
       <StatsCounter stats={stats} />
       <CategoriesSection />
-      <TopGigsSection />
       <HowItWorksSection />
       <TrustedBySection />
-      <TestimonialsSection />
       <DualCtaSection />
       <Footer />
     </main>

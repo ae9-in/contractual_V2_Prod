@@ -60,7 +60,7 @@ export function BusinessTopbar({ user }: { user: BusinessUser }) {
 
   return (
     <header
-      className="flex h-14 w-full shrink-0 items-center justify-between border-b bg-white px-6"
+      className="business-topbar flex h-14 w-full shrink-0 items-center justify-between border-b bg-white px-6"
       style={{ borderColor: "#e2e8f0", height: 56 }}
     >
       <div>

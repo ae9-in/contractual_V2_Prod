@@ -18,9 +18,9 @@ export function FreelancerShell({
   user: FreelancerUser
 }) {
   return (
-    <div className="min-h-screen bg-[#f4f6f9] font-sans text-[#0f172a] antialiased">
+    <div className="freelancer-shell min-h-screen bg-[#f4f6f9] font-sans text-[#0f172a] antialiased">
       <FreelancerTopNav user={user} />
-      <div className="container-page pb-8 pt-[76px]">{children}</div>
+      <div className="freelancer-shell-main container-page pb-8 pt-[76px]">{children}</div>
     </div>
   )
 }

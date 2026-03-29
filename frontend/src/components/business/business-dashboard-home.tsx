@@ -258,7 +258,7 @@ export function BusinessDashboardHome({ initialData }: { initialData?: Dashboard
   }
 
   return (
-    <motion.div className="mx-auto w-full max-w-[1600px]" variants={container} initial="hidden" animate="show">
+    <motion.div className="business-dashboard-page mx-auto w-full max-w-[1600px]" variants={container} initial="hidden" animate="show">
       <motion.section variants={section} className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-[20px] font-bold leading-tight" style={{ color: TEXT }}>

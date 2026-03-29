@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { GigDetailView } from "@/components/gig/gig-detail-view"
+import { getCategoryGigImage } from "@/lib/category-gig-image"
 
 /**
  * Optimized for high performance: Fetches real data from PostgreSQL 
@@ -42,15 +43,7 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
   // Basic SEO-friendly slug
   const categorySlug = gig.category.toLowerCase().replace(/\s+/g, "-").replace("&", "and")
   
-  // Category-based branding
-  const categoryImages: Record<string, string> = {
-    Development: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200",
-    Design: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200",
-    Writing: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200",
-    Marketing: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200",
-    Default: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1200"
-  }
-  const mainImage = categoryImages[gig.category] || categoryImages.Default
+  const mainImage = getCategoryGigImage(gig.category)
 
   const mappedGig = {
     ...gig,
@@ -63,8 +56,8 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
     categorySlug,
     gallery: [
       mainImage,
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800",
+      mainImage,
+      mainImage,
     ],
     location: gig.business.location || "Remote",
     postedAgo: "Posted recently",

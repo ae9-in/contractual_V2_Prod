@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronRight, Grid3X3, List, ChevronDown, X } from "lucide-react"
 import { Navbar } from "@/components/navbar"
@@ -8,13 +8,61 @@ import { Footer } from "@/components/footer"
 import { FilterSidebar } from "@/components/gigs/filter-sidebar"
 import { GigCard } from "@/components/gig-card"
 import { cn } from "@/lib/utils"
-import { MOCK_GIGS } from "@/lib/mock-data"
+import { getCategoryGigImage } from "@/lib/category-gig-image"
+
+type ApiGig = {
+  id: string
+  title: string
+  category: string
+  budgetAmount: number
+  minBudget: number | null
+  maxBudget: number | null
+  business: {
+    name: string
+    companyName: string | null
+    image: string | null
+  }
+}
 
 export default function BrowsePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [sortBy, setSortBy] = useState("best-match")
-  const [activeFilters, setActiveFilters] = useState<string[]>(["Design", "Development"])
+  const [sortBy, setSortBy] = useState("latest")
+  const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [gigs, setGigs] = useState<ApiGig[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/gigs?limit=60&sort=${encodeURIComponent(sortBy)}`, { cache: "no-store" })
+        const json = (await res.json()) as { data?: ApiGig[]; error?: string }
+        if (!res.ok) throw new Error(json.error ?? "Failed to load gigs")
+        if (!active) return
+        setGigs(Array.isArray(json.data) ? json.data : [])
+        setError(null)
+      } catch (e) {
+        if (!active) return
+        setError(e instanceof Error ? e.message : "Failed to load gigs")
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    setLoading(true)
+    void load()
+    const interval = setInterval(() => {
+      void load()
+    }, 15000)
+
+    return () => {
+      active = false
+      clearInterval(interval)
+    }
+  }, [sortBy])
 
   const removeFilter = (filter: string) => {
     setActiveFilters(activeFilters.filter((f) => f !== filter))
@@ -81,7 +129,7 @@ export default function BrowsePage() {
               <div className="bg-white rounded-xl border border-[var(--border)] p-4 mb-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <p className="text-[var(--text-primary)]">
-                    <span className="font-semibold font-mono">{MOCK_GIGS.length}</span> gigs found
+                    <span className="font-semibold font-mono">{gigs.length}</span> gigs found
                   </p>
 
                   <div className="flex items-center gap-4">
@@ -91,11 +139,11 @@ export default function BrowsePage() {
                         onChange={(e) => setSortBy(e.target.value)}
                         className="appearance-none pl-4 pr-10 py-2 text-sm border border-[var(--border)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
                       >
-                        <option value="best-match">Best Match</option>
-                        <option value="newest">Newest</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="rating">Highest Rated</option>
+                        <option value="latest">Latest</option>
+                        <option value="latest">Newest</option>
+                        <option value="budget_low">Price: Low to High</option>
+                        <option value="budget_high">Price: High to Low</option>
+                        <option value="deadline">Deadline</option>
                       </select>
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)] pointer-events-none" />
                     </div>
@@ -168,19 +216,44 @@ export default function BrowsePage() {
                     : "grid-cols-1"
                 )}
               >
-                {MOCK_GIGS.map((gig) => (
-                  <GigCard key={gig.id} {...gig} />
+                {loading && (
+                  <>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={`loading-${i}`} className="w-full min-w-[280px] max-w-[320px] h-[360px] rounded-[14px] border border-[var(--border)] bg-white animate-pulse" />
+                    ))}
+                  </>
+                )}
+
+                {!loading && !error && gigs.map((gig) => (
+                  <GigCard
+                    key={gig.id}
+                    id={gig.id}
+                    title={gig.title}
+                    category={gig.category}
+                    freelancer={{
+                      name: gig.business.companyName || gig.business.name || "Business",
+                      avatar: gig.business.image || "",
+                      isPro: false,
+                    }}
+                    price={gig.budgetAmount}
+                    minBudget={gig.minBudget ?? undefined}
+                    maxBudget={gig.maxBudget ?? undefined}
+                    image={getCategoryGigImage(gig.category)}
+                  />
                 ))}
               </div>
 
-              <div className="flex justify-center mt-12">
-                <button
-                  type="button"
-                  className="px-8 py-3 rounded-lg text-base font-semibold text-[var(--primary)] border-2 border-[var(--primary)] hover:bg-[var(--primary-light)] transition-all duration-300 btn-premium"
-                >
-                  Load More Gigs
-                </button>
-              </div>
+              {!loading && error && (
+                <div className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
+
+              {!loading && !error && gigs.length === 0 && (
+                <div className="mt-8 rounded-xl border border-[var(--border)] bg-white p-8 text-center text-[var(--text-secondary)]">
+                  No live gigs available right now.
+                </div>
+              )}
             </div>
           </div>
         </div>

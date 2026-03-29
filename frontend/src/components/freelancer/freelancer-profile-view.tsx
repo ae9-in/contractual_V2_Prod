@@ -62,7 +62,13 @@ export function FreelancerProfileView({ f }: { f: MockFreelancer }) {
           <div className="flex flex-col md:flex-row items-start gap-6">
             <div className="relative">
               <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden ring-4 ring-white shadow-lg">
-                <Image src={f.avatar} alt="" fill className="object-cover" sizes="128px" />
+                {f.avatar ? (
+                  <Image src={f.avatar} alt="" fill className="object-cover" sizes="128px" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] flex items-center justify-center text-white text-3xl font-semibold">
+                    {f.name?.charAt(0) || "F"}
+                  </div>
+                )}
               </div>
               {f.online && (
                 <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 rounded-full border-4 border-white">

@@ -13,6 +13,7 @@ import {
   MessageSquare,
   PlusCircle,
   Settings,
+  User,
   Users,
 } from "lucide-react"
 import { qk } from "@/lib/realtime/query-keys"
@@ -42,6 +43,7 @@ const hiringNav: NavItem[] = [
 
 const accountNav: NavItem[] = [
   { href: "/business/messages", label: "Messages", icon: MessageSquare, badgeKey: "msgs" },
+  { href: "/business/profile", label: "Profile", icon: User },
   { href: "/business/billing", label: "Payments", icon: CreditCard },
   { href: "/business/settings", label: "Settings", icon: Settings },
 ]
@@ -131,6 +133,7 @@ export function BusinessSidebar({ user }: { user: BusinessUser }) {
 
   return (
     <aside
+      data-mobile-nav="business"
       className="relative flex h-screen w-[220px] shrink-0 flex-col overflow-y-auto border-r border-white/10 shadow-[inset_-1px_0_0_rgba(255,255,255,0.06)]"
       style={{ background: SIDEBAR_BG }}
     >
@@ -198,7 +201,10 @@ export function BusinessSidebar({ user }: { user: BusinessUser }) {
           <HelpCircle className="h-3.5 w-3.5 shrink-0" />
           Support
         </Link>
-        <div className="mt-2 flex w-full items-center gap-2.5 rounded-lg p-2.5 text-left">
+        <Link
+          href="/business/profile"
+          className="mt-2 flex w-full items-center gap-2.5 rounded-lg p-2.5 text-left transition-colors hover:bg-white/10"
+        >
           <div
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm ring-2 ring-white/15"
             style={{ background: "linear-gradient(145deg, #7eb8bb, #4a8f93)" }}
@@ -210,7 +216,7 @@ export function BusinessSidebar({ user }: { user: BusinessUser }) {
             <p className="truncate text-[11px] text-slate-400">Business</p>
           </div>
           <ChevronDown className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-        </div>
+        </Link>
       </div>
     </aside>
   )

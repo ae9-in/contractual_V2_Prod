@@ -91,13 +91,19 @@ export function GigDetailView({ gig }: { gig: MockGigDetail }) {
                   href={`/freelancer/${gig.freelancerId}`}
                   className="relative w-14 h-14 rounded-full overflow-hidden ring-2 ring-[var(--primary-light)] shrink-0"
                 >
-                  <Image
-                    src={gig.freelancer.avatar}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
+                  {gig.freelancer.avatar ? (
+                    <Image
+                      src={gig.freelancer.avatar}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="56px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] flex items-center justify-center text-white font-semibold">
+                      {gig.freelancer.name?.charAt(0) || "F"}
+                    </div>
+                  )}
                 </Link>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">

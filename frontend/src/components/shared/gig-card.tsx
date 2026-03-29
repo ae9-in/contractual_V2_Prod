@@ -17,8 +17,8 @@ export interface SharedGigCardProps {
     avatar: string
     isPro?: boolean
   }
-  rating: number
-  reviewCount: number
+  rating?: number
+  reviewCount?: number
   price: number
   minBudget?: number
   maxBudget?: number
@@ -35,6 +35,14 @@ const gradients = [
   "from-[#a3c4b8] to-[#7ba896]",
 ]
 
+function gradientFromId(id: string) {
+  let hash = 0
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+  }
+  return gradients[hash % gradients.length]
+}
+
 export function GigCard({
   id,
   title,
@@ -50,8 +58,7 @@ export function GigCard({
   gradient,
 }: SharedGigCardProps) {
   const [liked, setLiked] = useState(false)
-  const randomGradient =
-    gradient || gradients[Number(id) % gradients.length]
+  const randomGradient = gradient || gradientFromId(id)
 
   return (
     <Link
@@ -146,15 +153,21 @@ export function GigCard({
           {title}
         </h3>
 
-        <div className="flex items-center gap-1.5 mb-3">
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-          <span className="text-sm font-bold font-mono text-[var(--text-primary)]">
-            {rating.toFixed(1)}
-          </span>
-          <span className="text-xs text-[var(--text-secondary)]">
-            ({reviewCount} reviews)
-          </span>
-        </div>
+        {typeof rating === "number" && typeof reviewCount === "number" && reviewCount > 0 ? (
+          <div className="flex items-center gap-1.5 mb-3">
+            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+            <span className="text-sm font-bold font-mono text-[var(--text-primary)]">
+              {rating.toFixed(1)}
+            </span>
+            <span className="text-xs text-[var(--text-secondary)]">
+              ({reviewCount} reviews)
+            </span>
+          </div>
+        ) : (
+          <div className="mb-3">
+            <span className="text-xs text-[var(--text-secondary)]">New gig</span>
+          </div>
+        )}
       </div>
 
       <div className="px-4 pb-4 pt-3 border-t border-[var(--border)] flex items-center justify-between">

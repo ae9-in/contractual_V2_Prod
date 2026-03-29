@@ -7,30 +7,22 @@ export const uPhoto = (photoId: string, w = 400, h = 300) => {
 
 /** Category hero images (spec). */
 export const CATEGORY_PHOTOS: Record<string, string> = {
-  Development: "1461749280684-dccba630e2f6",
-  Design: "1558655146-9f40138edfeb",
-  Writing: "1455390582262-044cdead277a",
-  Marketing: "1460925895917-afdab827c52f",
-  Video: "/images/video-production.png",
-  "Social Media": "1611162617474-5b21e879e113",
-  SEO: "1504868584819-f8e8b4b6d7e3",
-  Consulting: "1552664730-d307ca884978",
-  DevOps: "1518770660439-4636190af475",
-  "Data & Analytics": "/images/data-analytics.png",
+  Development: "/images/categories/development.svg",
+  Design: "/images/categories/design.svg",
+  Writing: "/images/categories/writing.svg",
+  Marketing: "/images/categories/marketing.svg",
+  Video: "/images/categories/video.svg",
+  "Social Media": "/images/categories/social-media.svg",
+  SEO: "/images/categories/seo.svg",
+  Consulting: "/images/categories/consulting.svg",
+  DevOps: "/images/categories/devops.svg",
+  "Data & Analytics": "/images/categories/data-analytics.svg",
 }
 
-export const FREELANCER_AVATAR_IDS = [
-  "1507003211169-0a1dd7228f2d",
-  "1494790108377-be9c29b29330",
-  "1500648767791-00dcc994a43e",
-  "1472099645785-5658abf4ff4e",
-  "1438761681033-6461ffad8d80",
-  "1534528741775-53994a69daeb",
-] as const
-
 export function avatarUrl(index: number, size = 128) {
-  const id = FREELANCER_AVATAR_IDS[index % FREELANCER_AVATAR_IDS.length]
-  return uPhoto(id, size, size)
+  void index
+  void size
+  return ""
 }
 
 export type GigBadge = "top-rated" | "fast-delivery" | null

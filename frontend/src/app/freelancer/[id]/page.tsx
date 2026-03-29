@@ -48,7 +48,13 @@ export default async function FreelancerPage({ params }: { params: Promise<{ id:
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="-mt-20 shrink-0 flex flex-col items-center lg:items-start group">
               <div className="relative w-40 h-40 rounded-3xl bg-white p-2 shadow-xl">
-                <Image src={p.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.id}`} width={160} height={160} alt={p.name} className="w-full h-full rounded-2xl object-cover bg-gray-100" />
+                {p.image ? (
+                  <Image src={p.image} width={160} height={160} alt={p.name} className="w-full h-full rounded-2xl object-cover bg-gray-100" />
+                ) : (
+                  <div className="w-full h-full rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-white text-5xl font-black">
+                    {p.name?.charAt(0) || "F"}
+                  </div>
+                )}
               </div>
             </div>
 

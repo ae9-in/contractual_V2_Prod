@@ -186,7 +186,7 @@ export function FreelancerBrowseGigs() {
   }, [applyGig, bid, cover, qc])
 
   return (
-    <div className="-mx-4 min-h-[calc(100vh-76px)] bg-[#f0f2f8] px-4 py-6 md:-mx-8 md:px-8">
+    <div className="freelancer-browse-page -mx-4 min-h-[calc(100vh-76px)] bg-[#f0f2f8] px-4 py-6 md:-mx-8 md:px-8">
       <div className="mx-auto w-full max-w-[1280px] space-y-6">
         <header className="w-full">
           <h1

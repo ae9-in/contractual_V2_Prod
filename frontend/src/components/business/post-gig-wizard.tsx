@@ -240,7 +240,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl pb-24">
+    <div className="post-gig-wizard-page mx-auto max-w-6xl pb-24">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <Link
