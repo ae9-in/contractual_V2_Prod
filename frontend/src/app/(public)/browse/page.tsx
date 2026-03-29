@@ -17,6 +17,7 @@ type ApiGig = {
   budgetAmount: number
   minBudget: number | null
   maxBudget: number | null
+  bannerImage?: string | null
   business: {
     name: string
     companyName: string | null
@@ -224,23 +225,26 @@ export default function BrowsePage() {
                   </>
                 )}
 
-                {!loading && !error && gigs.map((gig) => (
-                  <GigCard
-                    key={gig.id}
-                    id={gig.id}
-                    title={gig.title}
-                    category={gig.category}
-                    freelancer={{
-                      name: gig.business.companyName || gig.business.name || "Business",
-                      avatar: gig.business.image || "",
-                      isPro: false,
-                    }}
-                    price={gig.budgetAmount}
-                    minBudget={gig.minBudget ?? undefined}
-                    maxBudget={gig.maxBudget ?? undefined}
-                    image={getCategoryGigImage(gig.category)}
-                  />
-                ))}
+                {!loading && !error && gigs.map((gig) => {
+                  const cardImage = gig.bannerImage || getCategoryGigImage(gig.category)
+                  return (
+                    <GigCard
+                      key={gig.id}
+                      id={gig.id}
+                      title={gig.title}
+                      category={gig.category}
+                      freelancer={{
+                        name: gig.business.companyName || gig.business.name || "Business",
+                        avatar: gig.business.image || "",
+                        isPro: false,
+                      }}
+                      price={gig.budgetAmount}
+                      minBudget={gig.minBudget ?? undefined}
+                      maxBudget={gig.maxBudget ?? undefined}
+                      image={cardImage}
+                    />
+                  )
+                })}
               </div>
 
               {!loading && error && (

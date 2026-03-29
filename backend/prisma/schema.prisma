@@ -279,6 +279,7 @@ model Gig {
   maxBudget       Float?
   currency        String    @default("INR")
   deadline        DateTime?
+  bannerImage     String?
   duration        String?
   experienceLevel String
   isUrgent        Boolean   @default(false)

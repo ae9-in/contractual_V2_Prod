@@ -35,6 +35,12 @@ export const uploadRouter = {
   })
     .middleware(async () => await getSessionOrThrow())
     .onUploadComplete(() => {}),
+
+  gigBanner: f({
+    image: { maxFileSize: "8MB", maxFileCount: 1 },
+  })
+    .middleware(async () => await getSessionOrThrow())
+    .onUploadComplete(() => {}),
 } satisfies FileRouter
 
 export type OurFileRouter = typeof uploadRouter

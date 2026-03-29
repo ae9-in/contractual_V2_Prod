@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -16,6 +17,7 @@ import {
   X,
 } from "lucide-react"
 import { toast } from "sonner"
+import { UploadButton } from "@/lib/uploadthing-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -84,6 +86,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
     "BEGINNER" | "INTERMEDIATE" | "EXPERT"
   >("INTERMEDIATE")
   const [deliverables, setDeliverables] = useState<string[]>([""])
+  const [bannerImage, setBannerImage] = useState("")
 
   const [budgetKind, setBudgetKind] = useState<"fixed" | "hourly">("fixed")
   const [minBudget, setMinBudget] = useState(8000)
@@ -115,6 +118,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
           setDuration(g.duration || DURATIONS[2])
           setDeadline(g.deadline ? new Date(g.deadline) : undefined)
           setSpecialRequirements(g.specialRequirements || "")
+          setBannerImage(g.bannerImage || "")
         }
       } catch (e) {
         console.error("Failed to load gig for edit", e)
@@ -182,6 +186,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
             isUrgent,
             specialRequirements: specialRequirements.trim() || undefined,
             deliverables: deliverables.map((x) => x.trim()).filter(Boolean),
+            bannerImage: bannerImage || undefined,
           }
         : {
             title: title.trim(),
@@ -198,6 +203,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
             isUrgent,
             specialRequirements: specialRequirements.trim() || undefined,
             deliverables: deliverables.map((x) => x.trim()).filter(Boolean),
+            bannerImage: bannerImage || undefined,
           }
 
       const res = await fetch(editId ? `/api/gigs/${editId}` : "/api/gigs", {
@@ -347,6 +353,45 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
                 />
                 <p className="mt-1 text-right text-[11px] text-[#94a3b8]">
                   {description.length}/2000
+                </p>
+              </div>
+              <div>
+                <label className={LABEL}>Preview banner image</label>
+                <div className="relative mt-2 h-32 overflow-hidden rounded-[12px] border border-dashed border-[#cbd5f5] bg-[#f4f6fb]">
+                  {bannerImage ? (
+                    <Image
+                      src={bannerImage}
+                      alt="Gig banner preview"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width:1024px) 100vw, 100vw"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-[13px] font-semibold text-[#6d9c9f]">
+                      Upload a banner for the live preview card
+                    </div>
+                  )}
+                  <UploadButton
+                    endpoint="gigBanner"
+                    onClientUploadComplete={(res) => {
+                      if (res?.[0]) setBannerImage(res[0].url)
+                    }}
+                    onUploadError={(error) => toast.error(error.message)}
+                    className="absolute inset-0"
+                  />
+                  {bannerImage && (
+                    <button
+                      type="button"
+                      onClick={() => setBannerImage("")}
+                      className="absolute top-2 right-2 rounded-full bg-white/80 p-1 text-[#0f172a] shadow"
+                      aria-label="Remove banner"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="mt-1 text-[11px] text-[#94a3b8]">
+                  JPG/PNG up to 8MB · Recommended 1280×720
                 </p>
               </div>
               <div className="flex items-center justify-between gap-4 rounded-[8px] border border-[#e2e8f0] p-4">
@@ -706,7 +751,19 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
             Live preview
           </p>
           <div className="overflow-hidden rounded-[12px] border border-[#e2e8f0] bg-white shadow-md">
-            <div className="h-[120px] bg-gradient-to-br from-[#6d9c9f] to-[#2d7a7e]" />
+            <div className="relative h-[120px]">
+              {bannerImage ? (
+                <Image
+                  src={bannerImage}
+                  alt="Live preview banner"
+                  fill
+                  className="object-cover"
+                  sizes="(min-width:1024px) 100vw, 100vw"
+                />
+              ) : (
+                <div className="h-full bg-gradient-to-br from-[#6d9c9f] to-[#2d7a7e]" />
+              )}
+            </div>
             <div className="space-y-3 p-4">
               {isUrgent && (
                 <span

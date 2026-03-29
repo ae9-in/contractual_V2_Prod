@@ -43,7 +43,7 @@ export default async function GigPage({ params }: { params: Promise<{ id: string
   // Basic SEO-friendly slug
   const categorySlug = gig.category.toLowerCase().replace(/\s+/g, "-").replace("&", "and")
   
-  const mainImage = getCategoryGigImage(gig.category)
+  const mainImage = gig.bannerImage || getCategoryGigImage(gig.category)
 
   const mappedGig = {
     ...gig,

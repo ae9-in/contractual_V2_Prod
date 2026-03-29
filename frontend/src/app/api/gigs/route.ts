@@ -18,6 +18,7 @@ const gigDraftSchema = z.object({
   title: z.string().min(1).max(80),
   description: z.string().max(2000).optional(),
   category: z.string().max(120).optional(),
+  bannerImage: z.string().url().optional().nullable(),
   budgetType: z.enum(["FIXED", "HOURLY", "MILESTONE"]).optional(),
   minBudget: z.coerce.number().nonnegative().optional(),
   maxBudget: z.coerce.number().positive().optional(),
@@ -36,6 +37,7 @@ const gigPublishSchema = z
     title: z.string().min(1).max(80),
     description: z.string().min(20).max(2000),
     category: z.string().min(1),
+    bannerImage: z.string().url().optional().nullable(),
     budgetType: z.enum(["FIXED", "HOURLY", "MILESTONE"]),
     minBudget: z.coerce.number().nonnegative(),
     maxBudget: z.coerce.number().positive(),
@@ -212,6 +214,7 @@ function buildGigCreateData(
     duration: draft?.duration ?? pub?.duration ?? null,
     experienceLevel,
     isUrgent: draft?.isUrgent ?? pub?.isUrgent ?? false,
+    bannerImage: draft?.bannerImage ?? pub?.bannerImage ?? null,
     specialRequirements: draft?.specialRequirements ?? pub?.specialRequirements ?? null,
     ...(deliverables?.length
       ? { deliverables: deliverables as Prisma.InputJsonValue }
