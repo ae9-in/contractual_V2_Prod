@@ -506,7 +506,20 @@ export function AdminContractsPage() {
   )
 }
 
-// --- ANALYTICS ---
+// --- ANALYTICS & PAYMENTS ---
+
+export function AdminPaymentsPage() {
+  return (
+    <div className="space-y-6 pb-20">
+      <h1 className="text-3xl font-black tracking-tighter text-white">Platform Payments</h1>
+      <div className="h-[400px] flex flex-col items-center justify-center border border-white/5 bg-white/5 rounded-3xl text-white/40">
+        <IndianRupee className="h-12 w-12 mb-4 text-teal-400 opacity-50" />
+        <p className="text-sm font-bold">Payment gateway (Razorpay/Stripe) integration pending.</p>
+      </div>
+    </div>
+  )
+}
+
 
 export function AdminAnalyticsPage() {
   return (
@@ -515,6 +528,17 @@ export function AdminAnalyticsPage() {
       <div className="h-[500px] flex flex-col items-center justify-center border border-white/5 bg-white/5 rounded-3xl text-white/20">
         <ExternalLink className="h-10 w-10 mb-2" />
         <p className="text-sm font-bold italic">Deep analytics integration with Posthog/Mixpanel coming soon.</p>
+      </div>
+    </div>
+  )
+}
+
+export function AdminUsersPage() {
+  return (
+    <div className="space-y-6 pb-20">
+      <h1 className="text-3xl font-black tracking-tighter text-white">All Users</h1>
+      <div className="h-[400px] flex flex-col items-center justify-center border border-white/5 bg-white/5 rounded-3xl text-white/40">
+        <p className="text-sm font-bold">Please manage specific user types in the Freelancers or Businesses directories.</p>
       </div>
     </div>
   )
