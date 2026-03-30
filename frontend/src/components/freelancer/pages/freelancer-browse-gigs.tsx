@@ -374,7 +374,7 @@ export function FreelancerBrowseGigs() {
       </div>
 
       <Dialog open={!!applyGig} onOpenChange={(o) => !o && setApplyGig(null)}>
-        <DialogContent className="apply-gig-dialog w-[min(92vw,34rem)] max-w-lg overflow-x-hidden">
+        <DialogContent className="apply-gig-dialog max-sm:fixed max-sm:bottom-0 max-sm:top-auto max-sm:left-0 max-sm:right-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:w-full max-sm:max-w-none max-sm:rounded-t-2xl max-sm:rounded-b-none w-[min(92vw,34rem)] max-w-lg overflow-x-hidden">
           <DialogHeader className="pr-8 text-left">
             <DialogTitle className="leading-tight break-words">
               Apply — {applyGig?.title}
