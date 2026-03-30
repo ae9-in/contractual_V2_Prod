@@ -280,8 +280,8 @@ export function FreelancerProfilePremium({ initialData }: { initialData?: Profil
 
             {/* Left - Avatar & Core Info */}
             <div className="relative group w-40 h-40 shrink-0">
-              <div className="w-full h-full rounded-full border-[6px] border-white overflow-hidden bg-gray-100 shadow-xl">
-                {p.image ? <Image src={p.image} fill alt="Avatar" className="object-cover" /> : <div className="w-full h-full flex items-center justify-center text-3xl font-black bg-teal-100 text-teal-700">{p.name.slice(0, 1)}</div>}
+              <div className="relative w-full h-full rounded-full border-[6px] border-white overflow-hidden bg-gray-100 shadow-xl">
+                {p.image ? <Image src={p.image} fill alt="Avatar" className="object-cover rounded-full" /> : <div className="w-full h-full flex items-center justify-center text-3xl font-black bg-teal-100 text-teal-700">{p.name.slice(0, 1)}</div>}
               </div>
               <div className="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                 <Camera className="text-white w-8 h-8" />
