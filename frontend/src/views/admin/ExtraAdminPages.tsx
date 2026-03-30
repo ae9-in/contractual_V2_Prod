@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import { toast } from "sonner"
 import { 
   Check, 
@@ -21,20 +22,19 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { formatCurrency } from "@/lib/currency"
 import { formatDistanceToNow } from "date-fns"
+
+const Table = dynamic(() => import("@/components/ui/table").then((mod) => mod.Table as any), { ssr: false }) as any
+const TableBody = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableBody as any), { ssr: false }) as any
+const TableCell = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableCell as any), { ssr: false }) as any
+const TableHead = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHead as any), { ssr: false }) as any
+const TableHeader = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHeader as any), { ssr: false }) as any
+const TableRow = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableRow as any), { ssr: false }) as any
 
 // --- FREELANCERS MANAGEMENT (Real-time) ---
 

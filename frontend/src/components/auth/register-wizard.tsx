@@ -26,6 +26,7 @@ import {
   Shield,
   Zap,
   Users,
+  AlertCircle,
   Award as TrophyIcon
 } from "lucide-react"
 import { useForm, useFieldArray } from "react-hook-form"
@@ -853,12 +854,29 @@ export function FreelancerRegisterWizard() {
                     </label>
                     {errors.agreeToTerms && <p className="text-xs text-red-500">{errors.agreeToTerms.message}</p>}
 
-                    <div className="flex gap-4">
+                    {Object.keys(errors).length > 0 && (
+                      <div className="rounded-xl bg-red-50 p-4 border border-red-100 mb-4 animate-in fade-in slide-in-from-top-2">
+                        <div className="flex items-center gap-2 text-red-700 mb-2">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-xs font-bold uppercase tracking-wider">Required Improvements</span>
+                        </div>
+                        <ul className="space-y-1">
+                          {Object.entries(errors).map(([key, error]) => (
+                            <li key={key} className="text-[11px] font-medium text-red-600 flex items-center gap-1.5 capitalize">
+                              <div className="w-1 h-1 rounded-full bg-red-400" />
+                              {key === "agreeToTerms" ? "You must agree to the terms of service" : (error as any).message}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <div className="flex gap-4 pt-2">
                       <Button type="button" variant="outline" onClick={prevStep} className="h-12 flex-1 rounded-xl font-bold">Back</Button>
                       <Button 
                         type="submit" 
-                        disabled={isSubmitting || !isValid} 
-                        className="h-14 flex-[2] rounded-xl bg-gradient-to-br from-teal-500 to-teal-800 text-white font-black text-lg shadow-2xl shadow-teal-500/20"
+                        disabled={isSubmitting} 
+                        className="h-14 flex-[2] rounded-xl bg-gradient-to-br from-teal-500 to-teal-800 text-white font-black text-lg shadow-2xl shadow-teal-500/20 active:scale-[0.98] transition-transform"
                       >
                         {isSubmitting ? "Launching..." : "Launch My Profile 🚀"}
                       </Button>

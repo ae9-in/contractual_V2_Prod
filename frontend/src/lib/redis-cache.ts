@@ -45,6 +45,13 @@ export async function redisSetJson(key: string, value: JsonValue, ttlSeconds: nu
   })
 }
 
+export async function redisBumpVersion(key: string): Promise<number> {
+  const current = (await redisGetJson<number>(key)) ?? 1
+  const next = current + 1
+  await redisSetJson(key, next, 7 * 24 * 60 * 60)
+  return next
+}
+
 export async function redisDel(keys: string | string[]): Promise<void> {
   const all = Array.isArray(keys) ? keys : [keys]
   if (!all.length) return
@@ -54,4 +61,3 @@ export async function redisDel(keys: string | string[]): Promise<void> {
 export function withRedisKeyPrefix(prefix: string, key: string) {
   return `${prefix}:${key}`
 }
-

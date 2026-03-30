@@ -2,20 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { format, addDays } from "date-fns"
 import { motion, AnimatePresence } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
-import {
-  Line,
-  LineChart,
-  PolarAngleAxis,
-  RadialBar,
-  RadialBarChart,
-  ResponsiveContainer,
-} from "recharts"
 import {
   Bell,
   Search,
@@ -55,14 +48,6 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Calendar } from "@/components/ui/calendar"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -80,20 +65,33 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Slider } from "@/components/ui/slider"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useCountUp } from "@/lib/hooks/use-count-up"
 import { cn } from "@/lib/utils"
+
+const Line = dynamic(() => import("recharts").then((mod) => mod.Line as any), { ssr: false }) as any
+const LineChart = dynamic(() => import("recharts").then((mod) => mod.LineChart as any), { ssr: false }) as any
+const PolarAngleAxis = dynamic(() => import("recharts").then((mod) => mod.PolarAngleAxis as any), { ssr: false }) as any
+const RadialBar = dynamic(() => import("recharts").then((mod) => mod.RadialBar as any), { ssr: false }) as any
+const RadialBarChart = dynamic(() => import("recharts").then((mod) => mod.RadialBarChart as any), { ssr: false }) as any
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer as any), { ssr: false }) as any
+
+const Dialog = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.Dialog as any), { ssr: false }) as any
+const DialogContent = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.DialogContent as any), { ssr: false }) as any
+const DialogDescription = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.DialogDescription as any), { ssr: false }) as any
+const DialogFooter = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.DialogFooter as any), { ssr: false }) as any
+const DialogHeader = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.DialogHeader as any), { ssr: false }) as any
+const DialogTitle = dynamic(() => import("@/components/ui/dialog").then((mod) => mod.DialogTitle as any), { ssr: false }) as any
+
+const Table = dynamic(() => import("@/components/ui/table").then((mod) => mod.Table as any), { ssr: false }) as any
+const TableBody = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableBody as any), { ssr: false }) as any
+const TableCell = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableCell as any), { ssr: false }) as any
+const TableHead = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHead as any), { ssr: false }) as any
+const TableHeader = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHeader as any), { ssr: false }) as any
+const TableRow = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableRow as any), { ssr: false }) as any
 export type GigStatus = "Open" | "In Review" | "Urgent" | "Closed" | "Draft"
 
 const CATEGORY_OPTIONS = [

@@ -2,15 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
+import dynamic from "next/dynamic"
 import {
   Eye,
   Send,
@@ -23,12 +15,26 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { GigCard } from "@/components/gig-card"
 import { useQuery } from "@tanstack/react-query"
 import { useCountUp } from "@/lib/hooks/use-count-up"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
+
+const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar as any), { ssr: false }) as any
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart as any), { ssr: false }) as any
+const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid as any), { ssr: false }) as any
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer as any), { ssr: false }) as any
+const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip as any), { ssr: false }) as any
+const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis as any), { ssr: false }) as any
+const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis as any), { ssr: false }) as any
+
+const Table = dynamic(() => import("@/components/ui/table").then((mod) => mod.Table as any), { ssr: false }) as any
+const TableBody = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableBody as any), { ssr: false }) as any
+const TableCell = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableCell as any), { ssr: false }) as any
+const TableHead = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHead as any), { ssr: false }) as any
+const TableHeader = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableHeader as any), { ssr: false }) as any
+const TableRow = dynamic(() => import("@/components/ui/table").then((mod) => mod.TableRow as any), { ssr: false }) as any
 
 // Removed mock proposals for live data
 
