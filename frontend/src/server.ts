@@ -45,15 +45,27 @@ void app.prepare().then(() => {
       }
       const early = parse(req.url ?? "/", true)
       const pathOnly = (early.pathname ?? "").replace(/\/$/, "") || "/"
+      
+      // DEBUG: Log all API requests to help diagnose 404s
+      if (pathOnly.includes("/api/")) {
+        console.log(`[Server] Incoming ${req.method} request to: ${pathOnly}`);
+      }
+
       const isLoginPath = pathOnly === "/api/app/mobile-login" || 
                           pathOnly === "/api/mobile/login" || 
-                          pathOnly === "/api/auth/mobile"
+                          pathOnly === "/api/auth/mobile" ||
+                          pathOnly.endsWith("/mobile/login") || 
+                          pathOnly.endsWith("/auth/mobile");
+
       if (req.method === "POST" && isLoginPath) {
         void (async () => {
           try {
+            console.log(`[Server] Handling MOBILE LOGIN for path: ${pathOnly}`);
             const raw = await readRequestBody(req)
             const host = req.headers.host ?? `localhost:${port}`
-            const webReq = new Request(`http://${host}${pathOnly}`, {
+            // Always use HTTPS for the internal request if we're on Render
+            const protocol = req.headers['x-forwarded-proto'] || 'http';
+            const webReq = new Request(`${protocol}://${host}${pathOnly}`, {
               method: "POST",
               headers: { "content-type": req.headers["content-type"] ?? "application/json" },
               body: raw,
