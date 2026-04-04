@@ -8,7 +8,7 @@ dotenv.config({ path: path.join(process.cwd(), ".env.local") })
 import { createServer } from "node:http"
 import type { IncomingMessage } from "node:http"
 import { parse } from "node:url"
-import next from "next"
+// import next from "next" (Moved to dynamic import to prevent early crash)
 import jwt from "jsonwebtoken"
 import { Server as SocketServer } from "socket.io"
 import { setIo } from "./lib/socket-emitter"
@@ -31,12 +31,11 @@ const dev = process.env.NODE_ENV !== "production"
 const hostname = process.env.HOSTNAME ?? "localhost"
 const port = Number(process.env.PORT ?? 3000)
 
-const app = next({ dev })
-const handle = app.getRequestHandler()
-// @ts-ignore
-const compress = compression()
-
-void app.prepare().then(() => {
+void (async () => {
+  const nextDefault = (await import("next")).default;
+  const app = nextDefault({ dev })
+  await app.prepare();
+  const handle = app.getRequestHandler()
   const server = createServer((req, res) => {
     try {
       if ((req.url ?? "").startsWith("/socket.io")) {
@@ -178,4 +177,4 @@ void app.prepare().then(() => {
   server.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`)
   })
-})
+})()
