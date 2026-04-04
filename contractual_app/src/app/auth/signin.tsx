@@ -25,7 +25,7 @@ export default function SignInScreen() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.post('/api/mobile/login', {
+      const response = await api.post('/api/app-mobile-login', {
         email,
         password,
         role: accountType,

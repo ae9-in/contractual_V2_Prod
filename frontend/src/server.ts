@@ -51,11 +51,9 @@ void app.prepare().then(() => {
         console.log(`[Server] Incoming ${req.method} request to: ${pathOnly}`);
       }
 
-      const isLoginPath = pathOnly === "/api/app/mobile-login" || 
+      const isLoginPath = pathOnly === "/api/app-mobile-login" || 
                           pathOnly === "/api/mobile/login" || 
-                          pathOnly === "/api/auth/mobile" ||
-                          pathOnly.endsWith("/mobile/login") || 
-                          pathOnly.endsWith("/auth/mobile");
+                          pathOnly === "/api/auth/mobile";
 
       if (req.method === "POST" && isLoginPath) {
         void (async () => {
