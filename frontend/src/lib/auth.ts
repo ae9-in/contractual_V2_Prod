@@ -124,22 +124,23 @@ async function authWithBearerFallback() {
   try {
     const h = await headers()
     const authHeader = h.get("authorization") ?? h.get("Authorization")
+    console.log(`[authWithBearerFallback] Header found: ${authHeader ? 'Yes' : 'No'}`);
+    
     if (!authHeader?.startsWith("Bearer ")) return session
 
     const token = authHeader.slice("Bearer ".length).trim()
-    if (!token) return session
+    console.log(`[authWithBearerFallback] Token length: ${token.length}`);
 
     const secret = process.env.NEXTAUTH_SECRET
-    if (!secret) return session
-
-    const decoded = jwt.verify(token, secret) as {
-      id?: string
-      sub?: string
-      email?: string
-      role?: string
+    if (!secret) {
+      console.error("[authWithBearerFallback] CRITICAL: NEXTAUTH_SECRET is missing");
+      return session
     }
 
+    const decoded = jwt.verify(token, secret) as any
     const userId = decoded.sub ?? decoded.id
+    console.log(`[authWithBearerFallback] Decoded User ID: ${userId}`);
+    
     if (!userId) return session
 
     const user = await prisma.user.findUnique({

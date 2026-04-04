@@ -46,9 +46,9 @@ void (async () => {
       const early = parse(req.url ?? "/", true)
       const pathOnly = (early.pathname ?? "").replace(/\/$/, "") || "/"
       
-      // DEBUG: Log all API requests to help diagnose 404s
+      const authHeader = req.headers["authorization"] ?? req.headers["Authorization"];
       if (pathOnly.includes("/api/")) {
-        console.log(`[Server] Incoming ${req.method} request to: ${pathOnly}`);
+        console.log(`[Express] Request: ${req.method} ${pathOnly} | Auth: ${authHeader ? 'Yes' : 'No'}`);
       }
 
       const isLoginPath = pathOnly === "/api/app-mobile-login" || 
