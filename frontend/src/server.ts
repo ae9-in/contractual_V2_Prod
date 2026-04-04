@@ -1,17 +1,30 @@
 import "dotenv/config"
 import path from "path"
 import dotenv from "dotenv"
+// Monorepo root .env (local dev), then frontend/.env.local — Render injects env; files optional
 dotenv.config({ path: path.join(process.cwd(), "..", ".env") })
+dotenv.config({ path: path.join(process.cwd(), ".env.local") })
 import { createServer } from "node:http"
+import type { IncomingMessage } from "node:http"
 import { parse } from "node:url"
 import next from "next"
 import jwt from "jsonwebtoken"
 import { Server as SocketServer } from "socket.io"
 import { setIo } from "./lib/socket-emitter"
 import { prisma } from "./lib/prisma"
+import { handleMobileLogin } from "./lib/mobile-auth-login"
 
 // @ts-ignore
 const compression = require("compression")
+
+function readRequestBody(req: IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    req.on("data", (c) => chunks.push(c as Buffer))
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")))
+    req.on("error", reject)
+  })
+}
 
 const dev = process.env.NODE_ENV !== "production"
 const hostname = process.env.HOSTNAME ?? "localhost"
@@ -30,6 +43,38 @@ void app.prepare().then(() => {
         void handle(req, res, parsedUrl)
         return
       }
+      const early = parse(req.url ?? "/", true)
+      const pathOnly = (early.pathname ?? "").replace(/\/$/, "") || "/"
+      const isLoginPath = pathOnly === "/api/app/mobile-login" || 
+                          pathOnly === "/api/mobile/login" || 
+                          pathOnly === "/api/auth/mobile"
+      if (req.method === "POST" && isLoginPath) {
+        void (async () => {
+          try {
+            const raw = await readRequestBody(req)
+            const host = req.headers.host ?? `localhost:${port}`
+            const webReq = new Request(`http://${host}${pathOnly}`, {
+              method: "POST",
+              headers: { "content-type": req.headers["content-type"] ?? "application/json" },
+              body: raw,
+            })
+            const response = await handleMobileLogin(webReq)
+            res.statusCode = response.status
+            response.headers.forEach((value, key) => {
+              const k = key.toLowerCase()
+              if (k === "transfer-encoding" || k === "connection") return
+              res.setHeader(key, value)
+            })
+            res.end(await response.text())
+          } catch (e) {
+            console.error("[POST /api/app/mobile-login]", e)
+            res.statusCode = 500
+            res.setHeader("content-type", "application/json; charset=utf-8")
+            res.end(JSON.stringify({ success: false, message: "Internal server error", error: "Internal server error" }))
+          }
+        })()
+        return
+      }
       // @ts-ignore
       compress(req, res, () => {
         const parsedUrl = parse(req.url ?? "/", true)
@@ -42,8 +87,19 @@ void app.prepare().then(() => {
     }
   })
 
-  // BUG-007 Fix: Explicit CORS Origin
-  const allowedOrigins = [process.env.NEXTAUTH_URL, "http://localhost:3000", "http://localhost:1166"].filter(Boolean) as string[]
+  // BUG-007 Fix: CORS — include public app URL + socket URL (must match Render env, not localhost)
+  const allowedOrigins = Array.from(
+    new Set(
+      [
+        process.env.NEXTAUTH_URL,
+        process.env.NEXT_PUBLIC_APP_URL,
+        process.env.NEXT_PUBLIC_SOCKET_URL,
+        process.env.RENDER_EXTERNAL_URL,
+        "http://localhost:3000",
+        "http://localhost:1166",
+      ].filter(Boolean) as string[]
+    )
+  )
   
   const io = new SocketServer(server, {
     path: "/socket.io",

@@ -4,13 +4,15 @@ import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
 import { ApprovalStatus, Role } from "@prisma/client"
+import { headers } from "next/headers"
+import jwt from "jsonwebtoken"
 import { prisma } from "@/lib/prisma"
 
 
 
 import { getClientIp, rateLimit } from "./rate-limit"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuthInstance = NextAuth({
   trustHost: true,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt", maxAge: 24 * 60 * 60 }, // BUG-015 Fix: 24h session
@@ -111,6 +113,71 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 })
+
+const nextAuthAuth = nextAuthInstance.auth
+export const { handlers, signIn, signOut } = nextAuthInstance
+
+async function authWithBearerFallback() {
+  const session = await nextAuthAuth()
+  if (session?.user?.id) return session
+
+  try {
+    const h = await headers()
+    const authHeader = h.get("authorization") ?? h.get("Authorization")
+    if (!authHeader?.startsWith("Bearer ")) return session
+
+    const token = authHeader.slice("Bearer ".length).trim()
+    if (!token) return session
+
+    const secret = process.env.NEXTAUTH_SECRET
+    if (!secret) return session
+
+    const decoded = jwt.verify(token, secret) as {
+      id?: string
+      sub?: string
+      email?: string
+      role?: string
+    }
+
+    const userId = decoded.sub ?? decoded.id
+    if (!userId) return session
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        role: true,
+        approvalStatus: true,
+      },
+    })
+
+    if (!user) return session
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image ?? undefined,
+        role: String(user.role),
+        approvalStatus: String(user.approvalStatus ?? ApprovalStatus.APPROVED),
+      },
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    }
+  } catch {
+    return session
+  }
+}
+
+export const auth = ((...args: unknown[]) => {
+  if (args.length > 0) {
+    return (nextAuthAuth as (...inner: unknown[]) => unknown)(...args)
+  }
+  return authWithBearerFallback()
+}) as typeof nextAuthAuth
 
 import { cache } from 'react'
 export const getCurrentUser = cache(async () => {
