@@ -17,6 +17,7 @@ import { handleMobileLogin } from "./lib/mobile-auth-login"
 
 // @ts-ignore
 const compression = require("compression")
+const compress = compression()
 
 function readRequestBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
