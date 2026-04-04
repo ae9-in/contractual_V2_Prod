@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server"
+// No next/server imports here to prevent early AsyncLocalStorage crash
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { prisma } from "@/lib/prisma"
@@ -12,7 +12,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
     const role = body?.role
 
     if (!email || !password) {
-      return NextResponse.json(
+      return Response.json(
         { success: false, message: "Email and password are required", error: "Email and password are required" },
         { status: 400 }
       )
@@ -24,7 +24,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
     console.log(`[handleMobileLogin] User lookup for ${email}: ${user ? 'Found' : 'Not Found'}`);
 
     if (!user || !user.passwordHash) {
-      return NextResponse.json(
+      return Response.json(
         { success: false, message: "Invalid credentials", error: "Invalid credentials" },
         { status: 401 }
       )
@@ -33,7 +33,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
     const normalizedRole = typeof role === "string" ? role.toUpperCase().trim() : undefined
     if (normalizedRole && String(user.role) !== normalizedRole) {
       console.log(`[handleMobileLogin] Role mismatch: User=${user.role}, Request=${normalizedRole}`);
-      return NextResponse.json(
+      return Response.json(
         { success: false, message: "Unauthorized role", error: "Unauthorized role" },
         { status: 401 }
       )
@@ -43,7 +43,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
     console.log(`[handleMobileLogin] Password match for ${email}: ${isValid}`);
 
     if (!isValid) {
-      return NextResponse.json(
+      return Response.json(
         { success: false, message: "Invalid credentials", error: "Invalid credentials" },
         { status: 401 }
       )
@@ -51,7 +51,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
 
     const secret = process.env.NEXTAUTH_SECRET
     if (!secret) {
-      return NextResponse.json(
+      return Response.json(
         { success: false, message: "Server configuration error", error: "Server configuration error" },
         { status: 500 }
       )
@@ -67,7 +67,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
       { expiresIn: "30d", subject: user.id }
     )
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
       token,
       user: {
@@ -80,7 +80,7 @@ export async function handleMobileLogin(req: Request): Promise<Response> {
     })
   } catch (error) {
     console.error("Mobile auth error:", error)
-    return NextResponse.json(
+    return Response.json(
       { success: false, message: "Internal server error", error: "Internal server error" },
       { status: 500 }
     )
