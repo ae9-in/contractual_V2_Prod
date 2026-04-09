@@ -1,4 +1,4 @@
-import { ContractStatus, Role } from "@prisma/client"
+import { ContractStatus, Role, GigStatus, DisputeStatus } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import { jsonErr, jsonOk } from "@/lib/api-response"
 import { prisma } from "@/lib/prisma"
@@ -35,8 +35,8 @@ export async function GET() {
       where: { status: ContractStatus.COMPLETED },
       _sum: { agreedPrice: true },
     }),
-    prisma.gig.count({ where: { status: "FLAGGED" } }),
-    prisma.dispute.count({ where: { status: "OPEN" } }),
+    prisma.gig.count({ where: { status: GigStatus.FLAGGED } }),
+    prisma.dispute.count({ where: { status: DisputeStatus.OPEN } }),
   ])
 
   const payload = {

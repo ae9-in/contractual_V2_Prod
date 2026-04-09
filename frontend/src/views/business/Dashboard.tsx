@@ -1247,7 +1247,7 @@ export function BusinessDashboardPage() {
                       </div>
                       <p className="mt-3 text-[13px] italic text-[var(--text-secondary)]">&ldquo;{a.tagline}&rdquo;</p>
                       <div className="mt-3 flex flex-wrap gap-1">
-                        {a.skills.map((s) => (
+                        {a.skills.map((s: string) => (
                           <span key={s} className="rounded-md bg-[var(--primary-light)] px-2 py-0.5 text-[10px] font-semibold text-[var(--primary-dark)]">
                             {s}
                           </span>

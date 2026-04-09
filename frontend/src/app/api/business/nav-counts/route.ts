@@ -33,9 +33,9 @@ export async function GET() {
       ? 0
       : await prisma.message.count({
           where: {
-            contractId: { in: ids },
+            conversation: { contractId: { in: ids } },
             senderId: { not: bid },
-            isRead: false,
+            NOT: { readBy: { has: bid } },
           },
         })
 

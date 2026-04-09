@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
         contract: {
           include: {
             gig: { select: { title: true } },
-            messages: { take: 20, orderBy: { createdAt: "asc" } },
+            conversation: { include: { messages: { take: 20, orderBy: { createdAt: "asc" } } } },
           },
         },
         raisedBy: { select: { id: true, name: true, email: true } },

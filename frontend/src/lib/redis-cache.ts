@@ -37,7 +37,7 @@ export async function redisGetJson<T>(key: string): Promise<T | null> {
   }
 }
 
-export async function redisSetJson(key: string, value: JsonValue, ttlSeconds: number): Promise<void> {
+export async function redisSetJson(key: string, value: any, ttlSeconds: number): Promise<void> {
   const payload = JSON.stringify(value)
   await redisRequest(`/set/${encodeURIComponent(key)}`, {
     method: "POST",

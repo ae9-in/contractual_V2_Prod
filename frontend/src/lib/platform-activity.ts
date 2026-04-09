@@ -12,7 +12,7 @@ export async function logPlatformActivity(input: {
         type: input.type,
         userId: input.userId ?? undefined,
         message: input.message,
-        metadata: input.metadata ?? undefined,
+        metadata: input.metadata ? (input.metadata as any) : undefined,
       },
     })
   } catch (e) {

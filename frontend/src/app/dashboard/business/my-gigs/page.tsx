@@ -118,11 +118,7 @@ export default function MyGigsPage() {
 
   return (
     <DashboardLayout userType="business">
-      <DashboardHeader 
-        title="My Gigs" 
-        subtitle="Manage your posted gigs and review applicants"
-        userType="business"
-      />
+      <DashboardHeader userType="business" />
 
       <div className="p-6 space-y-6">
         {/* Stats Overview */}

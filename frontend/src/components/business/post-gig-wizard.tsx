@@ -400,7 +400,7 @@ export function PostGigWizardPage({ editId }: { editId?: string }) {
                           })
                       }
                     }}
-                    onUploadError={(error) => toast.error(error.message)}
+                    onUploadError={(error) => { toast.error(error.message) }}
                     className="absolute inset-0"
                   />
                   {bannerImage && (

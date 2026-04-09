@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { motion, useReducedMotion } from "framer-motion"
-import { Search, Briefcase, Users, TrendingUp, Star, Zap } from "lucide-react"
+import { Search, Briefcase, Users, TrendingUp, Star, Zap, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const HERO_IMAGE =
@@ -65,7 +65,7 @@ export function HeroSection() {
   const [suggestions, setSuggestions] = useState<any[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
-  const searchRef = useRef<HTMLDivElement>(null)
+  const searchRef = useRef<HTMLFormElement>(null)
   const reduceMotion = useReducedMotion()
 
   useEffect(() => {

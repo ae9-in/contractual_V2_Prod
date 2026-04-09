@@ -44,12 +44,12 @@ export async function GET(req: NextRequest) {
   }
 
   const [categories, levels, urgentCount] = await prisma.$transaction([
-    prisma.gig.groupBy({
+    (prisma.gig.groupBy as any)({
       by: ["category"],
       where,
       _count: { _all: true },
     }),
-    prisma.gig.groupBy({
+    (prisma.gig.groupBy as any)({
       by: ["experienceLevel"],
       where,
       _count: { _all: true },
@@ -60,14 +60,14 @@ export async function GET(req: NextRequest) {
   ])
 
   const categoryCounts: FacetCount[] = categories
-    .map((c) => ({ name: c.category, count: c._count._all }))
-    .filter((c) => c.name)
-    .sort((a, b) => b.count - a.count)
+    .map((c: any) => ({ name: c.category, count: c._count?._all ?? 0 }))
+    .filter((c: any) => c.name)
+    .sort((a: any, b: any) => b.count - a.count)
 
   const levelCounts: FacetCount[] = levels
-    .map((l) => ({ name: l.experienceLevel, count: l._count._all }))
-    .filter((l) => l.name)
-    .sort((a, b) => b.count - a.count)
+    .map((l: any) => ({ name: l.experienceLevel, count: l._count?._all ?? 0 }))
+    .filter((l: any) => l.name)
+    .sort((a: any, b: any) => b.count - a.count)
 
   const payload = {
     categories: categoryCounts,

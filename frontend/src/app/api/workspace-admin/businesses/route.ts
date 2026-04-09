@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const skip = (page - 1) * limit
 
   const where = {
-    role: Role.BUSINESS as const,
+    role: Role.BUSINESS,
     ...(status ? { approvalStatus: status } : {}),
   }
 

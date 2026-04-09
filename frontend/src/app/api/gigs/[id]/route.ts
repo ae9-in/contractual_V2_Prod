@@ -139,7 +139,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
       duration: u.duration,
       isUrgent: u.isUrgent,
       specialRequirements: u.specialRequirements,
-      deliverables: u.deliverables,
+      deliverables: u.deliverables ? (u.deliverables as any) : undefined,
       requiredSkills: requiredSkillsUpdate,
     },
     include: {

@@ -163,11 +163,7 @@ export default function ApplicantsPage() {
 
   return (
     <DashboardLayout userType="business">
-      <DashboardHeader 
-        title="Applicants" 
-        subtitle="Review and manage applications for your gigs"
-        userType="business"
-      />
+      <DashboardHeader userType="business" />
 
       <div className="p-6 space-y-6">
         {/* Quick Stats */}
