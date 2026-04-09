@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { cloneElement, forwardRef, useMemo, useState } from "react"
+import type { InputHTMLAttributes, ReactNode } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   Camera, 
@@ -29,7 +30,7 @@ import {
   AlertCircle,
   Award as TrophyIcon
 } from "lucide-react"
-import { useForm, useFieldArray } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { cn } from "@/lib/utils"
@@ -37,7 +38,6 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { UploadButton } from "@/lib/uploadthing-react"
 import { toast } from "sonner"
-import { formatCurrency } from "@/lib/currency"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -73,6 +73,32 @@ const PASSWORD_REQUIREMENTS = [
   { label: "One number", regex: /[0-9]/ },
   { label: "One special character", regex: /[^A-Za-z0-9]/ },
 ]
+
+const normalizeExternalUrl = (raw?: string | null) => {
+  const value = raw?.trim()
+  if (!value) return ""
+  const withProtocol = /^https?:\/\//i.test(value) ? value : `https://${value}`
+  try {
+    return new URL(withProtocol).toString()
+  } catch {
+    return null
+  }
+}
+
+const optionalExternalUrlSchema = z
+  .string()
+  .optional()
+  .or(z.literal(""))
+  .superRefine((value, ctx) => {
+    const normalized = normalizeExternalUrl(value)
+    if (normalized === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please enter a valid URL",
+      })
+    }
+  })
+  .transform((value) => normalizeExternalUrl(value) || "")
 
 const schema = z.object({
   // Step 1: Personal
@@ -117,9 +143,9 @@ const schema = z.object({
     title: z.string(),
     imageUrl: z.string()
   })).optional(),
-  linkedinUrl: z.string().optional(),
-  githubUrl: z.string().optional(),
-  websiteUrl: z.string().optional(),
+  linkedinUrl: optionalExternalUrlSchema,
+  githubUrl: optionalExternalUrlSchema,
+  websiteUrl: optionalExternalUrlSchema,
   
   // Terms
   agreeToTerms: z.literal(true, {
@@ -143,7 +169,8 @@ export function FreelancerRegisterWizard() {
     register, 
     handleSubmit, 
     watch, 
-    setValue, 
+    setValue,
+    getValues,
     formState: { errors, isValid },
     trigger,
     control
@@ -157,7 +184,10 @@ export function FreelancerRegisterWizard() {
       languages: [{ name: "English", proficiency: "Fluent" }],
       skills: [],
       portfolio: [],
-      gender: "Prefer not to say"
+      gender: "Prefer not to say",
+      linkedinUrl: "",
+      githubUrl: "",
+      websiteUrl: "",
     }
   })
 
@@ -194,6 +224,21 @@ export function FreelancerRegisterWizard() {
     if (step === 3) fieldsToValidate = ["skills"]
     if (step === 4) fieldsToValidate = ["portfolio", "linkedinUrl", "githubUrl", "websiteUrl"]
     
+    if (step === 4) {
+      const linkedinUrl = normalizeExternalUrl(getValues("linkedinUrl"))
+      const githubUrl = normalizeExternalUrl(getValues("githubUrl"))
+      const websiteUrl = normalizeExternalUrl(getValues("websiteUrl"))
+
+      if (linkedinUrl === null || githubUrl === null || websiteUrl === null) {
+        toast.error("Please enter valid profile links before continuing.")
+        return
+      }
+
+      setValue("linkedinUrl", linkedinUrl || "", { shouldValidate: true })
+      setValue("githubUrl", githubUrl || "", { shouldValidate: true })
+      setValue("websiteUrl", websiteUrl || "", { shouldValidate: true })
+    }
+
     const isStepValid = await trigger(fieldsToValidate)
     if (isStepValid) {
       setStep(s => Math.min(5, s + 1))
@@ -690,7 +735,7 @@ export function FreelancerRegisterWizard() {
                           >
                             {PROFICIENCY_LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
                           </select>
-                          <button onClick={() => setValue("skills", watchedSkills.filter(x => x.name !== s.name))} className="hover:text-red-500">
+                          <button type="button" onClick={() => setValue("skills", watchedSkills.filter(x => x.name !== s.name))} className="hover:text-red-500">
                             <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -751,7 +796,8 @@ export function FreelancerRegisterWizard() {
                               }}
                            />
                         </div>
-                        <button 
+                        <button
+                          type="button"
                           className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => setValue("portfolio", watchedPortfolio.filter((_, i) => i !== idx))}
                         >
@@ -782,8 +828,11 @@ export function FreelancerRegisterWizard() {
                   <div className="space-y-4 pt-10 border-t border-gray-100">
                     <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Connect Your Profiles</p>
                     <IconInput icon={<Linkedin className="text-blue-600" />} placeholder="linkedin.com/in/yourname" {...register("linkedinUrl")} />
+                    {errors.linkedinUrl?.message && <p className="text-xs text-red-500">{errors.linkedinUrl.message}</p>}
                     <IconInput icon={<Github className="text-gray-900" />} placeholder="github.com/yourusername" {...register("githubUrl")} />
+                    {errors.githubUrl?.message && <p className="text-xs text-red-500">{errors.githubUrl.message}</p>}
                     <IconInput icon={<Globe className="text-teal-600" />} placeholder="yourwebsite.com" {...register("websiteUrl")} />
+                    {errors.websiteUrl?.message && <p className="text-xs text-red-500">{errors.websiteUrl.message}</p>}
                   </div>
 
                   <div className="flex gap-4">
@@ -1016,19 +1065,25 @@ function SkillSearch({ onAdd }: { onAdd: (s: string) => void }) {
   )
 }
 
-function IconInput({ icon, ...props }: any) {
+type IconInputProps = InputHTMLAttributes<HTMLInputElement> & { icon: ReactNode }
+const IconInput = forwardRef<HTMLInputElement, IconInputProps>(({ icon, className, ...props }, ref) => {
   return (
-    <div className="relative group">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-60 group-focus-within:opacity-100 transition-opacity">
+    <div className="group relative">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-60 transition-opacity group-focus-within:opacity-100">
         {icon}
       </div>
-      <input 
-        className="h-12 w-full rounded-xl border border-gray-200 pl-11 pr-4 text-sm font-semibold outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-50"
+      <input
+        ref={ref}
+        className={cn(
+          "h-12 w-full rounded-xl border border-gray-200 pl-11 pr-4 text-sm font-semibold outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-50",
+          className
+        )}
         {...props}
       />
     </div>
   )
-}
+})
+IconInput.displayName = "IconInput"
 
 function CompletenessItem({ done, label }: { done: boolean, label: string }) {
   return (
@@ -1041,5 +1096,3 @@ function CompletenessItem({ done, label }: { done: boolean, label: string }) {
     </div>
   )
 }
-
-import { cloneElement } from "react"
