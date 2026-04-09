@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "cd frontend && npm run dev",
-    "build": "cd frontend && npm run build",
+    "build": "cd backend && npx prisma generate && cd ../frontend && npm run build",
     "db:migrate": "cd backend && npx prisma migrate dev",
     "db:generate": "cd backend && npx prisma generate",
     "db:push": "cd backend && npx prisma db push",
