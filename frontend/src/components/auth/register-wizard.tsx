@@ -34,6 +34,7 @@ import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { cn } from "@/lib/utils"
+import { formatCurrency } from "@/lib/currency"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { UploadButton } from "@/lib/uploadthing-react"
@@ -446,7 +447,7 @@ export function FreelancerRegisterWizard() {
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative group">
                       <div className={cn(
-                        "w-[120px] h-[120px] rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all",
+                        "relative w-[120px] h-[120px] rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all",
                         watchedImage ? "border-teal-500 ring-4 ring-teal-50" : "border-teal-200 bg-[#f0f9f9]"
                       )}>
                         {watchedImage ? (
@@ -889,7 +890,7 @@ export function FreelancerRegisterWizard() {
                   {/* MINI PREVIEW */}
                   <div className="rounded-2xl border border-gray-100 p-6 bg-white shadow-sm space-y-4">
                     <div className="flex gap-4">
-                      <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden shrink-0">
+                      <div className="relative w-16 h-16 rounded-full bg-gray-100 overflow-hidden shrink-0">
                         {watchedImage ? <Image src={watchedImage} fill alt="Avatar" className="object-cover" /> : <div className="w-full h-full bg-teal-50" />}
                       </div>
                       <div>

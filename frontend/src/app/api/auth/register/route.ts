@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs"
-import { ApprovalStatus, Role } from "@prisma/client"
+import { ApprovalStatus, Role, Prisma } from "@prisma/client"
 import { z } from "zod"
 import { jsonErr, jsonOk, zodErrorResponse } from "@/lib/api-response"
 import { logPlatformActivity } from "@/lib/platform-activity"
@@ -43,6 +43,13 @@ const schema = z.object({
 })
 
 export async function POST(req: Request) {
+  if (!process.env.DATABASE_URL) {
+    return jsonErr(
+      "Database not configured. Set DATABASE_URL in .env or .env.local and restart the dev server.",
+      500
+    )
+  }
+
   // BUG-010 Fix: Registration Rate Limit
   const ip = await getClientIp()
   const rl = rateLimit(`register:${ip}`, 100, 60 * 60 * 1000) // Temporarily 100 per hour for testing
@@ -203,6 +210,18 @@ export async function POST(req: Request) {
       pendingApproval: isBusiness,
     })
   } catch (e: any) {
+    if (
+      e instanceof Prisma.PrismaClientInitializationError ||
+      e?.message?.includes("Can't reach database server") ||
+      e?.message?.includes("Connection terminated")
+    ) {
+      console.error("Register DB Connection Error:", e)
+      return jsonErr(
+        "Database unavailable. Check DATABASE_URL and ensure PostgreSQL is running.",
+        500
+      )
+    }
+
     console.error("Register Error:", e)
     return jsonErr("Internal server error", 500)
   }
