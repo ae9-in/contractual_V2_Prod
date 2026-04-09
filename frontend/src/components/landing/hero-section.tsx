@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -62,14 +62,58 @@ export function HeroSection() {
   const authenticated = status === "authenticated"
   const [q, setQ] = useState("")
   const [mode, setMode] = useState<"talent" | "jobs">("talent")
+  const [suggestions, setSuggestions] = useState<any[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    if (!q || q.length < 2) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const res = await fetch(`/api/realtime/search?q=${encodeURIComponent(q)}&mode=${mode}`)
+        const json = await res.json()
+        if (json.ok) {
+          setSuggestions(json.data)
+          setShowSuggestions(json.data.length > 0)
+        }
+      } catch (err) {
+        console.error("Search failed:", err)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [q, mode])
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault()
     const query = q.trim()
-    const base = mode === "jobs" ? "/browse" : "/browse"
-    if (query) router.push(`${base}?q=${encodeURIComponent(query)}`)
+    // In this project, browse handles gigs, we might need a separate /freelancers page or query param
+    const base = mode === "jobs" ? "/browse" : "/browse" 
+    const finalQuery = mode === "talent" ? `${base}?type=talent&q=${encodeURIComponent(query)}` : `${base}?q=${encodeURIComponent(query)}`
+    
+    if (query) router.push(finalQuery)
     else router.push(base)
+    setShowSuggestions(false)
   }
 
   const motionProps = reduceMotion
@@ -250,14 +294,18 @@ export function HeroSection() {
                 </div>
               </div>
 
-              <form onSubmit={onSearch} className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+              <form onSubmit={onSearch} className="relative flex flex-col gap-3 sm:flex-row sm:items-stretch" ref={searchRef}>
                 <div className="flex flex-1 items-center gap-3 rounded-2xl border border-white/15 bg-white px-4 py-2 shadow-inner">
-                  <Search className="h-5 w-5 shrink-0 text-[var(--text-secondary)]" aria-hidden />
+                  <Search className={cn("h-5 w-5 shrink-0 transition-colors", isSearching ? "text-[var(--primary)] animate-pulse" : "text-[var(--text-secondary)]")} aria-hidden />
                   <input
                     type="search"
                     value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder="Search by role, skills, or keywords"
+                    onChange={(e) => {
+                      setQ(e.target.value)
+                      setShowSuggestions(true)
+                    }}
+                    onFocus={() => q.length >= 2 && setShowSuggestions(true)}
+                    placeholder={mode === "jobs" ? "Search for jobs, roles, or skills" : "Search for developers, designers, or talent"}
                     className="min-w-0 flex-1 bg-transparent py-3 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none"
                     aria-label="Search gigs and skills"
                   />
@@ -265,6 +313,46 @@ export function HeroSection() {
                 <button type="submit" className="btn-primary shrink-0 rounded-2xl !px-8 !py-3.5 text-base">
                   Search
                 </button>
+
+                {/* Real-time suggestions dropdown */}
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 z-[100] mt-2 overflow-hidden rounded-2xl border border-white/20 bg-white/95 p-2 shadow-2xl backdrop-blur-xl sm:right-auto sm:w-[calc(100%-140px)]">
+                    <div className="flex items-center justify-between px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+                      <span>Matches in {mode}</span>
+                      {isSearching && <span className="animate-pulse text-[var(--primary)]">Updating...</span>}
+                    </div>
+                    <div className="space-y-1">
+                      {suggestions.map((item) => (
+                        <Link 
+                          key={item.id} 
+                          href={item.url}
+                          className="flex items-center gap-3 rounded-xl p-3 transition-all hover:bg-[var(--primary-light)] group"
+                          onClick={() => setShowSuggestions(false)}
+                        >
+                          {item.image ? (
+                            <Image src={item.image} alt="" width={40} height={40} className="h-10 w-10 rounded-full object-cover ring-2 ring-white" />
+                          ) : (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
+                              {item.type === "job" ? <Briefcase className="h-5 w-5" /> : <Users className="h-5 w-5" />}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-bold text-[var(--text-primary)] group-hover:text-[var(--primary-dark)]">
+                              {item.title}
+                            </p>
+                            <p className="truncate text-xs text-[var(--text-secondary)]">
+                              {item.subtitle}
+                            </p>
+                          </div>
+                          {item.price && (
+                            <span className="text-xs font-bold text-[var(--primary-dark)]">{item.price}</span>
+                          )}
+                          <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </form>
 
               <div className="mt-5 flex flex-wrap items-center gap-x-8 gap-y-2 border-t border-white/10 pt-5">

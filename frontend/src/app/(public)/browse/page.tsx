@@ -8,7 +8,9 @@ import { Footer } from "@/components/footer"
 import { FilterSidebar } from "@/components/gigs/filter-sidebar"
 import { GigCard } from "@/components/gig-card"
 import { cn } from "@/lib/utils"
+import { useSearchParams } from "next/navigation"
 import { getCategoryGigImage } from "@/lib/category-gig-image"
+import { FreelancerCard } from "@/components/freelancer-card"
 
 type ApiGig = {
   id: string
@@ -26,14 +28,21 @@ type ApiGig = {
 }
 
 export default function BrowsePage() {
+  const searchParams = useSearchParams()
+  const typeParam = searchParams.get("type") // "talent" or default (gigs)
+  const qParam = searchParams.get("q") ?? ""
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState("latest")
-  const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const [activeFilters, setActiveFilters] = useState<string[]>(qParam ? [`Search: ${qParam}`] : [])
   const [showMobileFilters, setShowMobileFilters] = useState(false)
-  const [filters, setFilters] = useState<Record<string, unknown>>({})
+  const [filters, setFilters] = useState<Record<string, unknown>>(qParam ? { q: qParam } : {})
   const [gigs, setGigs] = useState<ApiGig[]>([])
+  const [freelancers, setFreelancers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const isTalentMode = typeParam === "talent"
 
   useEffect(() => {
     let active = true
@@ -49,15 +58,23 @@ export default function BrowsePage() {
           if (!s) continue
           sp.set(k, s)
         }
-        const res = await fetch(`/api/gigs?${sp.toString()}`)
-        const json = (await res.json()) as { data?: ApiGig[]; error?: string }
-        if (!res.ok) throw new Error(json.error ?? "Failed to load gigs")
+        const endpoint = isTalentMode ? "/api/freelancers" : "/api/gigs"
+        const res = await fetch(`${endpoint}?${sp.toString()}`)
+        const json = (await res.json())
+        if (!res.ok) throw new Error(json.error ?? "Failed to load data")
         if (!active) return
-        setGigs(Array.isArray(json.data) ? json.data : [])
+        
+        if (isTalentMode) {
+          setFreelancers(Array.isArray(json.data) ? json.data : [])
+          setGigs([])
+        } else {
+          setGigs(Array.isArray(json.data) ? json.data : [])
+          setFreelancers([])
+        }
         setError(null)
       } catch (e) {
         if (!active) return
-        setError(e instanceof Error ? e.message : "Failed to load gigs")
+        setError(e instanceof Error ? e.message : "Failed to load results")
       } finally {
         if (active) setLoading(false)
       }
@@ -166,7 +183,9 @@ export default function BrowsePage() {
               <div className="mb-6 rounded-2xl border border-[var(--border)] bg-white p-4 shadow-[0_6px_18px_rgba(15,23,42,0.04)]">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <p className="text-[var(--text-primary)]">
-                    <span className="font-semibold font-mono">{gigs.length}</span> gigs found
+                    <span className="font-semibold font-mono">
+                      {isTalentMode ? freelancers.length : gigs.length}
+                    </span> {isTalentMode ? "talents" : "gigs"} found
                   </p>
 
                   <div className="flex items-center gap-4">
@@ -264,7 +283,7 @@ export default function BrowsePage() {
                   </>
                 )}
 
-                {!loading && !error && gigs.map((gig) => {
+                {!loading && !error && !isTalentMode && gigs.map((gig) => {
                   const cardImage = gig.bannerImage || getCategoryGigImage(gig.category)
                   return (
                     <GigCard
@@ -284,6 +303,21 @@ export default function BrowsePage() {
                     />
                   )
                 })}
+
+                {!loading && !error && isTalentMode && freelancers.map((f) => (
+                  <FreelancerCard
+                    key={f.id}
+                    id={f.id}
+                    name={f.name}
+                    image={f.image}
+                    headline={f.headline}
+                    bio={f.bio}
+                    location={f.location}
+                    hourlyRate={f.hourlyRate}
+                    isVerified={f.isVerified}
+                    skills={f.skills}
+                  />
+                ))}
               </div>
 
               {!loading && error && (
@@ -292,9 +326,9 @@ export default function BrowsePage() {
                 </div>
               )}
 
-              {!loading && !error && gigs.length === 0 && (
+              {!loading && !error && (isTalentMode ? freelancers.length === 0 : gigs.length === 0) && (
                 <div className="mt-8 rounded-xl border border-[var(--border)] bg-white p-8 text-center text-[var(--text-secondary)]">
-                  No live gigs available right now.
+                  No {isTalentMode ? "talent" : "live gigs"} available right now.
                 </div>
               )}
             </div>

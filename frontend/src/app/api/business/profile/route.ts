@@ -3,6 +3,7 @@ import { z } from "zod"
 import { auth } from "@/lib/auth"
 import { jsonErr, jsonOk, zodErrorResponse } from "@/lib/api-response"
 import { prisma } from "@/lib/prisma"
+import { redisSetJson } from "@/lib/redis-cache"
 
 const patchSchema = z.object({
   name: z.string().min(1).optional(),
@@ -96,6 +97,9 @@ export async function PATCH(req: Request) {
       approvalStatus: true,
     },
   })
+
+  // Invalidate all public and private gig caches
+  await redisSetJson("gigs:cache-version", Date.now(), 86400)
 
   return jsonOk(updated)
 }
