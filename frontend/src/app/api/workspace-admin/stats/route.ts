@@ -6,6 +6,8 @@ import { requireWorkspaceAdmin } from "@/lib/workspace-admin/require-admin-api"
 import { formatCurrency } from "@/lib/currency"
 import { redisGetJson, redisSetJson } from "@/lib/redis-cache"
 
+export const dynamic = "force-dynamic"
+
 export async function GET() {
   const admin = await requireWorkspaceAdmin()
   if (!admin.ok) return jsonErr(admin.error, 401)
