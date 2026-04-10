@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Heart, ShoppingCart, Star } from "lucide-react"
+import { Heart, Mail, ShoppingCart, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { GigBadge } from "@/lib/mock-data"
 
@@ -25,6 +25,7 @@ export interface SharedGigCardProps {
   image?: string
   badge?: GigBadge
   gradient?: string
+  contactEmail?: string
 }
 
 const gradients = [
@@ -171,7 +172,7 @@ export function GigCard({
           </div>
         )}
 
-        <div className="mt-auto flex items-end justify-between gap-4 border-t border-[var(--border)] pt-4">
+        <div className="mt-auto flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4">
           <div className="min-w-0">
             <span className="text-xs font-medium uppercase tracking-[0.08em] text-[var(--text-secondary)]">
               {minBudget ? "Budget Range" : "Starting at"}
@@ -186,16 +187,35 @@ export function GigCard({
               </p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault()
-            }}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--primary)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)]"
-            aria-label="Add to cart"
-          >
-            <ShoppingCart className="h-4 w-4" />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {contactEmail && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  window.location.href = `mailto:${contactEmail}`
+                }}
+                title={`Contact ${freelancer.name}`}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-white text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--primary)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)]"
+                aria-label="Contact business by email"
+              >
+                <Mail className="h-4 w-4" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] text-[var(--text-secondary)] transition-all duration-200 hover:border-[var(--primary)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)]"
+              aria-label="Save gig"
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
     </Link>

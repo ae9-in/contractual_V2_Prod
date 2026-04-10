@@ -296,6 +296,7 @@ export default function BrowsePage() {
                         avatar: gig.business.image || "",
                         isPro: false,
                       }}
+                      contactEmail={gig.business.email}
                       price={gig.budgetAmount}
                       minBudget={gig.minBudget ?? undefined}
                       maxBudget={gig.maxBudget ?? undefined}

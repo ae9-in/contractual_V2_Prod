@@ -175,6 +175,7 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             image: true,
+            email: true,
             isVerified: true,
             companyName: true,
           },
