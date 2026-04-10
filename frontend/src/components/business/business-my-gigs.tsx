@@ -119,8 +119,13 @@ export function BusinessMyGigs() {
   const deleteGig = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/gigs/${id}`, { method: "DELETE" })
-      const j = (await res.json()) as { error?: string }
-      if (!res.ok) throw new Error(j.error ?? "Delete failed")
+      let j: { error?: string } | undefined
+      try {
+        j = (await res.json()) as { error?: string }
+      } catch {
+        // If the response is empty or invalid JSON, fallback to a generic message.
+      }
+      if (!res.ok) throw new Error(j?.error ?? "Delete failed")
     },
     onSuccess: () => {
       toast.success("Gig deleted")

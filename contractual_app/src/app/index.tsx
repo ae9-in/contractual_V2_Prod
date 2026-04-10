@@ -219,7 +219,7 @@ function SearchDock({
           textAlign: 'center', marginBottom: 12,
         }}>Trusted by teams at</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 24 }}>
-          {['Airbnb', 'Microsoft', 'Bissell'].map(brand => (
+          {['Atlasia', 'Ettiquete', 'OCC'].map(brand => (
             <Text key={brand} style={{
               color: C.textSecondary, fontSize: 12, fontWeight: '700', letterSpacing: 0.3,
             }}>{brand}</Text>

@@ -26,14 +26,12 @@ const footerLinks = {
       { label: "About", href: "/about" },
       { label: "Blog", href: "/blog" },
       { label: "Careers", href: "/careers" },
-      { label: "Press", href: "/press" },
       { label: "Partner Program", href: "/partners" },
     ],
   },
   support: {
     title: "Support",
     links: [
-      { label: "Help Center", href: "/help" },
       { label: "Contact Us", href: "/contact" },
       { label: "Dispute Resolution", href: "/disputes" },
       { label: "Trust & Safety", href: "/trust-safety" },

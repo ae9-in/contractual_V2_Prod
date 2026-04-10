@@ -166,7 +166,33 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
     return jsonErr("Forbidden", 403)
   }
 
-  await prisma.gig.delete({ where: { id } })
+  try {
+    const contractIds = await prisma.contract.findMany({
+      where: { gigId: id },
+      select: { id: true },
+    }).then((contracts) => contracts.map((contract) => contract.id))
+
+    if (contractIds.length > 0) {
+      await prisma.$transaction([
+        prisma.review.deleteMany({ where: { contractId: { in: contractIds } } }),
+        prisma.dispute.deleteMany({ where: { contractId: { in: contractIds } } }),
+        prisma.activityLog.deleteMany({ where: { contractId: { in: contractIds } } }),
+        prisma.conversation.deleteMany({ where: { contractId: { in: contractIds } } }),
+        prisma.submission.deleteMany({ where: { contractId: { in: contractIds } } }),
+        prisma.contract.updateMany({
+          where: { id: { in: contractIds } },
+          data: { applicationId: null },
+        }),
+        prisma.contract.deleteMany({ where: { id: { in: contractIds } } }),
+      ])
+    }
+
+    await prisma.gig.delete({ where: { id } })
+  } catch (error) {
+    console.error("[DELETE /api/gigs/[id]]", error)
+    return jsonErr("Failed to delete gig", 500)
+  }
+
   await Promise.all([
     redisSetJson("gigs:cache-version", Date.now(), 86400),
     redisDel(`gig:detail:${id}`),

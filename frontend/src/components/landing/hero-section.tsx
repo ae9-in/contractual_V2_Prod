@@ -360,7 +360,7 @@ export function HeroSection() {
                   Trusted by teams at
                 </span>
                 <div className="flex flex-wrap items-center gap-6 opacity-90">
-                  {["Microsoft", "Airbnb", "Glassdoor", "Bissell"].map((name) => (
+                  {["Atlasia", "Ettiquete", "OCC"].map((name) => (
                     <span
                       key={name}
                       className="font-stat text-sm font-semibold tracking-tight text-white/85"
