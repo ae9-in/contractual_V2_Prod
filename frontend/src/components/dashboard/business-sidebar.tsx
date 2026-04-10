@@ -16,6 +16,7 @@ import {
   User,
   Users,
 } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { qk } from "@/lib/realtime/query-keys"
 import { cn } from "@/lib/utils"
 import type { BusinessUser } from "./business-shell"
@@ -138,25 +139,10 @@ export function BusinessSidebar({ user }: { user: BusinessUser }) {
       style={{ background: SIDEBAR_BG }}
     >
       <div
-        className="flex h-14 shrink-0 items-center px-5"
+        className="flex h-14 shrink-0 items-center px-3"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
       >
-        <Link href="/" className="flex min-w-0 items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 text-[#6d9c9f]">
-            <path
-              d="M12 2L20 7V17L12 22L4 17V7L12 2Z"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="rgba(109,156,159,0.25)"
-            />
-          </svg>
-          <span
-            className="truncate text-[15px] font-bold text-slate-50"
-            style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
-          >
-            Contractual
-          </span>
-        </Link>
+        <Logo size="sm" showText={true} />
       </div>
 
       <div className="px-5 pb-2 pt-4">

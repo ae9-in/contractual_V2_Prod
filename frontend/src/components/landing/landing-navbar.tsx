@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Search, Menu, X, Zap, LayoutDashboard } from "lucide-react"
+import { Search, Menu, X, LayoutDashboard } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 import { useSession } from "next-auth/react"
 
@@ -36,12 +37,7 @@ export function LandingNavbar() {
     >
       <div className="container-page flex h-[72px] items-center justify-between gap-4">
         {/* Logo */}
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--gradient-primary)] shadow-[0_0_24px_var(--shadow-teal)] transition-transform hover:scale-[1.02]">
-            <Zap className="h-5 w-5 text-white" strokeWidth={2.5} />
-          </span>
-          <span className="text-xl font-extrabold tracking-tight text-white">Contractual</span>
-        </Link>
+        <Logo size="md" showText={true} />
 
         {/* Center nav — desktop */}
         <nav

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Search, Menu, X } from "lucide-react"
+import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
@@ -28,21 +29,10 @@ export function Navbar() {
     >
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
         <nav className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-3 lg:h-[72px] lg:gap-6">
-          <Link href="/" className="flex min-w-0 items-center gap-2 justify-self-start">
-            <div className="w-8 h-8 shrink-0 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] rounded-lg flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" />
-              </svg>
-            </div>
-            <span
-              className={cn(
-                "font-display truncate text-lg font-bold transition-colors duration-300 sm:text-xl",
-                scrolled ? "text-[var(--text-primary)]" : "text-white"
-              )}
-            >
-              Contractual
-            </span>
-          </Link>
+          <Logo size="sm" showText={true} linkClassName={cn(
+            "transition-opacity duration-300",
+            scrolled ? "opacity-100" : "opacity-100"
+          )} />
 
           <div className="hidden min-w-0 justify-self-stretch px-2 lg:block xl:px-8">
             <div className={cn(

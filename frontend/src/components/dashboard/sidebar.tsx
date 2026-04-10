@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import { cn } from "@/lib/utils"
+import { Logo } from "@/components/logo"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   LayoutDashboard,
@@ -108,24 +109,7 @@ export function DashboardSidebar({ userType }: SidebarProps) {
       )}
     >
       <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
-        <Link href="/" className="flex items-center gap-2 min-w-0">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-primary text-lg text-white">
-            ⬡
-          </span>
-          {!collapsed && (
-            <div className="flex min-w-0 flex-col leading-tight">
-              <span className="font-display truncate text-base font-bold text-white">Contractual</span>
-              <span
-                className={cn(
-                  "mt-0.5 w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold text-white",
-                  userType === "business" ? "bg-[var(--cta-amber)]" : userColor
-                )}
-              >
-                {userLabel}
-              </span>
-            </div>
-          )}
-        </Link>
+        <Logo size={collapsed ? "sm" : "md"} showText={!collapsed} />
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
