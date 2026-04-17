@@ -57,7 +57,7 @@ export function Footer() {
               size="md" 
               className="mb-4" 
               linkClassName="mb-6 !gap-3" 
-              textColorClassName="text-white"
+              textColorClassName="!text-white"
             />
             <p className="mb-6 max-w-[200px] text-sm text-white/60">Structured work. Trusted outcomes.</p>
             <div className="flex items-center gap-2">

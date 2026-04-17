@@ -36,7 +36,7 @@ export function Navbar() {
               "transition-opacity duration-300",
               scrolled ? "opacity-100" : "opacity-100"
             )}
-            textColorClassName={scrolled ? "text-[var(--text-primary)]" : "text-white"}
+            textColorClassName={scrolled ? "text-[var(--text-primary)]" : "!text-white"}
           />
 
           <div className="hidden min-w-0 justify-self-stretch px-2 lg:block xl:px-8">

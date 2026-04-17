@@ -112,7 +112,7 @@ export function DashboardSidebar({ userType }: SidebarProps) {
         <Logo 
           size={collapsed ? "sm" : "md"} 
           showText={!collapsed} 
-          textColorClassName="text-white"
+          textColorClassName="!text-white"
         />
         <button
           type="button"
