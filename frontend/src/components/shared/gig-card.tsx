@@ -57,6 +57,7 @@ export function GigCard({
   image,
   badge,
   gradient,
+  contactEmail,
 }: SharedGigCardProps) {
   const [liked, setLiked] = useState(false)
   const randomGradient = gradient || gradientFromId(id)
