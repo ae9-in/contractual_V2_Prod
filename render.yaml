@@ -4,9 +4,9 @@ services:
   - type: web
     name: contractual-v2-prod
     runtime: node
-    rootDir: frontend
-    buildCommand: npm ci && npm run build && npx tsc src/server.ts --outDir dist --esModuleInterop --skipLibCheck --target es6 --module commonjs
-    startCommand: node dist/server.js
+    buildCommand: npm install && cd backend && npx prisma generate && cd ../frontend && npm run build
+    preDeployCommand: cd backend && npx prisma db push --accept-data-loss
+    startCommand: cd frontend && node --import tsx src/server.ts
     healthCheckPath: /api/gigs
     envVars:
       - key: NODE_VERSION
