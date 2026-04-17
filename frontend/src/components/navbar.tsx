@@ -29,10 +29,15 @@ export function Navbar() {
     >
       <div className="max-w-[1280px] mx-auto px-4 lg:px-6">
         <nav className="grid h-16 grid-cols-[auto_1fr_auto] items-center gap-3 lg:h-[72px] lg:gap-6">
-          <Logo size="sm" showText={true} linkClassName={cn(
-            "transition-opacity duration-300",
-            scrolled ? "opacity-100" : "opacity-100"
-          )} />
+          <Logo 
+            size="sm" 
+            showText={true} 
+            linkClassName={cn(
+              "transition-opacity duration-300",
+              scrolled ? "opacity-100" : "opacity-100"
+            )}
+            textColorClassName={scrolled ? "text-[var(--text-primary)]" : "text-white"}
+          />
 
           <div className="hidden min-w-0 justify-self-stretch px-2 lg:block xl:px-8">
             <div className={cn(

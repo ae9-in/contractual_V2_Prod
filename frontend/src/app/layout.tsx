@@ -45,6 +45,11 @@ export const metadata: Metadata = {
       'Connect with skilled freelancers through structured gigs and transparent contracts.',
     type: 'website',
   },
+  icons: {
+    icon: '/WhatsApp_Image_2026-04-10_at_2.50.59_PM-removebg-preview.png',
+    shortcut: '/WhatsApp_Image_2026-04-10_at_2.50.59_PM-removebg-preview.png',
+    apple: '/WhatsApp_Image_2026-04-10_at_2.50.59_PM-removebg-preview.png',
+  },
 }
 
 export const viewport: Viewport = {

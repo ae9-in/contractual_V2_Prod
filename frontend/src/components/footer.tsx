@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Github, Instagram, Linkedin, Twitter } from "lucide-react"
+import { Logo } from "@/components/logo"
 
 const footerLinks = {
   forBusinesses: {
@@ -52,14 +53,12 @@ export function Footer() {
       <div className="container-page py-16 lg:py-20">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5 lg:gap-12">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
-            <Link href="/" className="group mb-4 flex shrink-0 items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--gradient-primary)] shadow-[0_0_20px_rgba(109,156,159,0.25)] transition-transform group-hover:scale-105 group-hover:rotate-3">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-              </span>
-              <span className="font-display text-xl font-bold tracking-tight text-white">Contractual</span>
-            </Link>
+            <Logo 
+              size="md" 
+              className="mb-4" 
+              linkClassName="mb-6 !gap-3" 
+              textColorClassName="text-white"
+            />
             <p className="mb-6 max-w-[200px] text-sm text-white/60">Structured work. Trusted outcomes.</p>
             <div className="flex items-center gap-2">
               {socialLinks.map((social) => (
