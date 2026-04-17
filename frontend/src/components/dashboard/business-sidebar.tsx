@@ -142,7 +142,7 @@ export function BusinessSidebar({ user }: { user: BusinessUser }) {
         className="flex h-14 shrink-0 items-center px-3"
         style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}
       >
-        <Logo size="sm" showText={true} />
+        <Logo size="sm" showText={true} textColorClassName="text-white" />
       </div>
 
       <div className="px-5 pb-2 pt-4">

@@ -54,7 +54,7 @@ export function LandingNavbar() {
     >
       <div className="container-page flex h-[72px] items-center justify-between gap-4">
         {/* Logo */}
-        <Logo size="md" showText={true} />
+        <Logo size="md" showText={true} textColorClassName="text-white" />
 
         {/* Center nav — desktop */}
         <nav

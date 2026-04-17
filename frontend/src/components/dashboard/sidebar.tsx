@@ -109,7 +109,11 @@ export function DashboardSidebar({ userType }: SidebarProps) {
       )}
     >
       <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
-        <Logo size={collapsed ? "sm" : "md"} showText={!collapsed} />
+        <Logo 
+          size={collapsed ? "sm" : "md"} 
+          showText={!collapsed} 
+          textColorClassName="text-white"
+        />
         <button
           type="button"
           onClick={() => setCollapsed(!collapsed)}
