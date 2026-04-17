@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useMemo } from "react"
+import { useSession } from "next-auth/react"
 import { FileText, Users, CheckCircle } from "lucide-react"
 
 const steps = [
@@ -25,6 +27,17 @@ const steps = [
 ]
 
 export function HowItWorksSection() {
+  const { data: session } = useSession()
+  const role = (session?.user as any)?.role as string | undefined
+
+  const joinLink = useMemo(() => {
+    if (!role) return "/auth/register"
+    if (role === "freelancer") return "/freelancer/dashboard"
+    if (role === "business") return "/business"
+    if (role === "admin") return "/admin/dashboard"
+    return "/auth/register"
+  }, [role])
+
   return (
     <section className="py-16 lg:py-24 bg-white overflow-hidden">
       <div className="container-page">
@@ -94,7 +107,7 @@ export function HowItWorksSection() {
             Start Hiring Today
           </Link>
           <Link
-            href="/auth/register"
+            href={joinLink}
             className="px-8 py-3.5 rounded-lg text-base font-semibold text-[var(--primary)] border-2 border-[var(--primary)] hover:bg-[var(--primary-light)] transition-all duration-300"
           >
             Join as Freelancer

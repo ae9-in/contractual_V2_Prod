@@ -40,7 +40,7 @@ export default function CommunityPage() {
       <LandingNavbar />
       
       {/* Hero Section */}
-      <section className="relative pt-[120px] pb-20 lg:pt-[160px] lg:pb-32 overflow-hidden bg-[var(--dark-surface)]">
+      <section className="relative pt-[92px] pb-16 lg:pt-[120px] lg:pb-24 min-h-[calc(100vh-72px)] overflow-hidden bg-[var(--dark-surface)]">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,var(--primary),transparent_50%)]" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_70%,var(--cta-amber),transparent_50%)]" />
@@ -99,7 +99,7 @@ export default function CommunityPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 lg:py-32">
+      <section id="features" className="py-20 lg:py-28">
         <div className="container-page">
           <div className="text-center mb-16 max-w-2xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-[var(--text-primary)] mb-4">
@@ -135,7 +135,7 @@ export default function CommunityPage() {
       </section>
 
       {/* Story / Vision Section */}
-      <section className="py-24 bg-[var(--bg-alt)] border-y border-[var(--border)]">
+      <section className="py-20 bg-[var(--bg-alt)] border-y border-[var(--border)]">
         <div className="container-page">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="w-full lg:w-1/2 relative aspect-square max-w-[500px]">
@@ -177,7 +177,7 @@ export default function CommunityPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 lg:py-32">
+      <section className="py-20 lg:py-28">
         <div className="container-page">
           <div className="relative rounded-[48px] overflow-hidden bg-[var(--gradient-primary)] px-8 py-20 text-center text-white">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl -mr-32 -mt-32 rounded-full" />

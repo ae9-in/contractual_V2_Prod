@@ -6,6 +6,7 @@ import { signOut, useSession } from "next-auth/react"
 import { useQuery } from "@tanstack/react-query"
 import { formatDistanceToNow } from "date-fns"
 import { cn } from "@/lib/utils"
+import { qk } from "@/lib/realtime/query-keys"
 import {
   Bell,
   Search,
@@ -58,7 +59,7 @@ export function DashboardHeader({
   const userEmail = session?.user?.email ?? ""
 
   const { data: notificationsData } = useQuery({
-    queryKey: ["notifications", "header"],
+    queryKey: qk.notifications(),
     queryFn: async () => {
       const res = await fetch("/api/notifications?limit=5")
       const j = await res.json()
@@ -68,8 +69,20 @@ export function DashboardHeader({
     refetchInterval: 30_000,
   })
 
+  const { data: messagesUnread } = useQuery({
+    queryKey: qk.messagesUnread(),
+    queryFn: async () => {
+      const res = await fetch("/api/messages/unread-count")
+      const j = await res.json()
+      return res.ok ? j.data?.count ?? 0 : 0
+    },
+    enabled: !!session?.user?.id,
+    refetchInterval: 30_000,
+  })
+
   const notifications = notificationsData?.data ?? []
   const unreadCount = notificationsData?.meta?.unread ?? 0
+  const unreadMessages = messagesUnread ?? 0
   const iconMuted = userType === "admin" ? "text-white/70" : "text-text-secondary"
   const actionHover = userType === "admin" ? "hover:bg-white/10" : "hover:bg-bg-alt"
 
@@ -143,7 +156,11 @@ export function DashboardHeader({
             className={cn("relative p-2.5 rounded-xl transition-colors", actionHover)}
           >
             <MessageSquare className={cn("w-5 h-5", iconMuted)} />
-            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary animate-pulse" />
+            {unreadMessages > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-5 rounded-full bg-primary text-[11px] text-white font-bold flex items-center justify-center px-1">
+                {unreadMessages > 9 ? "9+" : unreadMessages}
+              </span>
+            )}
           </Link>
 
           {/* Notifications */}

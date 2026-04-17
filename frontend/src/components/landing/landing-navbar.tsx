@@ -1,18 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { Search, Menu, X, LayoutDashboard } from "lucide-react"
 import { Logo } from "@/components/logo"
 import { cn } from "@/lib/utils"
 import { useSession } from "next-auth/react"
-
-const navLinks = [
-  { label: "Explore", href: "/auth/signin" },
-  { label: "Opportunities / Jobs", href: "/auth/signin" },
-  { label: "Community", href: "/community" },
-  { label: "Hire Talent", href: "/auth/register" },
-]
 
 function AppleIcon({ className }: { className?: string }) {
   return (
@@ -25,7 +18,31 @@ function AppleIcon({ className }: { className?: string }) {
 export function LandingNavbar() {
   const { data: session, status } = useSession()
   const authenticated = status === "authenticated"
+  const role = (session?.user as any)?.role as string | undefined
   const [open, setOpen] = useState(false)
+
+  const navLinks = useMemo(() => {
+    const exploreHref = "/browse"
+
+    const opportunitiesHref = authenticated
+      ? role === "freelancer"
+        ? "/freelancer/browse-gigs"
+        : role === "business"
+        ? "/business"
+        : role === "admin"
+        ? "/admin/dashboard"
+        : "/auth/signin"
+      : "/auth/signin"
+
+    const hireTalentHref = authenticated && role === "business" ? "/business" : "/auth/register"
+
+    return [
+      { label: "Explore", href: exploreHref },
+      { label: "Opportunities / Jobs", href: opportunitiesHref },
+      { label: "Community", href: "/community" },
+      { label: "Hire Talent", href: hireTalentHref },
+    ]
+  }, [authenticated, role])
 
   return (
     <header
@@ -90,7 +107,7 @@ export function LandingNavbar() {
             </>
           ) : (
             <Link
-              href={session?.user?.role === "business" ? "/business" : "/freelancer/dashboard"}
+              href={role === "business" ? "/business" : "/freelancer/dashboard"}
               className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-bold border border-white/20 hover:bg-white/20 transition-all"
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -147,7 +164,7 @@ export function LandingNavbar() {
               </>
             ) : (
               <Link
-                href={session?.user?.role === "business" ? "/business" : "/freelancer/dashboard"}
+                href={role === "business" ? "/business" : "/freelancer/dashboard"}
                 className="flex-1 py-3 text-center text-sm font-bold text-white bg-[var(--primary)] rounded-full"
                 onClick={() => setOpen(false)}
               >

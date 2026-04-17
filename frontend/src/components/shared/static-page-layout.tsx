@@ -11,9 +11,10 @@ interface StaticPageProps {
   ctaText?: string
   ctaLink?: string
   sections?: { title: string; items: string[] }[]
+  faq?: { question: string; answer: string }[]
 }
 
-export default function StaticPage({ heroTitle, content, items, ctaText, ctaLink, sections }: StaticPageProps) {
+export default function StaticPage({ heroTitle, content, items, ctaText, ctaLink, sections, faq }: StaticPageProps) {
   return (
     <div className="min-h-screen bg-[var(--bg-alt)]">
       <Navbar />
@@ -67,6 +68,31 @@ export default function StaticPage({ heroTitle, content, items, ctaText, ctaLink
                       </ul>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {faq && (
+                <div className="space-y-10">
+                  <div>
+                    <h2 className="text-3xl font-display font-bold text-[var(--text-primary)] mb-6">
+                      Frequently Asked Questions
+                    </h2>
+                    <div className="space-y-4">
+                      {faq.map((item, index) => (
+                        <div
+                          key={index}
+                          className="rounded-[32px] border border-[var(--border)] bg-white p-6 shadow-sm"
+                        >
+                          <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-3">
+                            {item.question}
+                          </h3>
+                          <p className="text-[var(--text-secondary)] leading-relaxed">
+                            {item.answer}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
 
